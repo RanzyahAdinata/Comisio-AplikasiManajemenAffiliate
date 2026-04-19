@@ -1,0 +1,227 @@
+/* Global Reset & Variables */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --primary: #c62828;
+  --primary-hover: #b71c1c;
+  --text-dark: #111111;
+  --text-gray: #666666;
+  --text-light: #999999;
+  --border: #d9d9d9;
+  --white: #ffffff;
+  --bg-light: #f7f7f7;
+  --font-sans: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--text-dark);
+  background: var(--white);
+  min-height: 100vh;
+}
+
+/* Shared Logo Styles */
+.logo-text {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.logo-badge {
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: var(--white);
+  padding: 1px 6px;
+  border-radius: 6px;
+  margin-left: 2px;
+}
+
+/* Shared Form Styles */
+.input-group {
+  width: 100%;
+  position: relative;
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 18px;
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  font-size: 0.95rem;
+  color: var(--text-dark);
+  outline: none;
+  transition: border-color 0.2s;
+  background: var(--white);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+}
+
+.form-input::placeholder {
+  color: var(--text-light);
+}
+
+.input-with-icon .form-input {
+  padding-left: 44px;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-gray);
+  display: flex;
+  align-items: center;
+}
+
+.btn-submit {
+  width: 100%;
+  padding: 16px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  letter-spacing: 0.3px;
+}
+
+.btn-submit:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-submit:active {
+  transform: translateY(0);
+}
+
+.link {
+  color: var(--primary);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.link:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+.social-login {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.social-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.social-btn:hover {
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(229, 24, 59, 0.15);
+}
+
+/* Image Placeholder */
+.image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e8e8e8 0%, #d0d0d0 100%);
+  color: var(--text-gray);
+  gap: 8px;
+}
+
+.image-placeholder p {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.image-placeholder small {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Alert / Notifikasi */
+.alert {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.alert-error {
+  background: #fff0f0;
+  color: #c91232;
+  border: 1px solid #f5c0c0;
+}
+
+.alert-success {
+  background: #f0fff4;
+  color: #1a7a3c;
+  border: 1px solid #b0e8c8;
+}
+
+.btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.form-input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+/* Glassmorphism Utilities (iOS Logic) */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px -6px rgba(0, 0, 0, 0.05);
+  border-radius: 16px;
+}
+
+.glass-bento-card {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px -8px rgba(0, 0, 0, 0.08);
+  border-radius: 24px;
+}
+
+.layered-container {
+  display: grid;
+  gap: var(--space-lg, 16px);
+  width: 100%;
+}

@@ -1,0 +1,427 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+/* Action Buttons */
+.manage-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.btn-add-product {
+  padding: 10px 22px;
+  background: #C0152E;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-add-product:hover {
+  background: #a01228;
+  transform: translateY(-1px);
+}
+
+.btn-seed-product {
+  padding: 10px 22px;
+  background: #1A3A8C;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-seed-product:hover {
+  background: #14306e;
+  transform: translateY(-1px);
+}
+
+.btn-seed-product:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.product-count {
+  margin-left: auto;
+  font-size: 0.82rem;
+  color: #888;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Products Table */
+.products-table-wrap {
+  background: white;
+  border-radius: 16px;
+  padding: 4px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  overflow-x: auto;
+}
+
+.products-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.products-table thead th {
+  padding: 14px 16px;
+  background: #f8f0f1;
+  color: #666;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+  border-bottom: 2px solid #f0e0e2;
+}
+
+.products-table tbody td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #f5f5f5;
+  font-size: 0.85rem;
+  color: #333;
+  vertical-align: middle;
+}
+
+.products-table tbody tr:hover {
+  background: #fdf8f9;
+}
+
+.products-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.td-center {
+  text-align: center;
+}
+
+.td-price {
+  font-weight: 700;
+  color: #111;
+  white-space: nowrap;
+}
+
+.td-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.product-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.product-emoji {
+  font-size: 1.6rem;
+  flex-shrink: 0;
+}
+
+.product-name {
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.product-desc {
+  font-size: 0.72rem;
+  color: #999;
+  margin: 2px 0 0;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: #f0f0f0;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+  white-space: nowrap;
+}
+
+.commission-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.btn-edit,
+.btn-delete {
+  background: none;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.2s;
+}
+
+.btn-edit:hover {
+  background: #e3f2fd;
+  border-color: #90caf9;
+}
+
+.btn-delete:hover {
+  background: #ffebee;
+  border-color: #ef9a9a;
+}
+
+.empty-state {
+  text-align: center !important;
+  padding: 40px 16px !important;
+  color: #999;
+  font-size: 0.88rem;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 20px;
+  padding: 32px;
+  width: 500px;
+  max-width: 90vw;
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 20px;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.modal-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-field label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.modal-field input,
+.modal-field select,
+.modal-field textarea {
+  padding: 12px 16px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.88rem;
+  color: #333;
+  outline: none;
+  transition: border-color 0.2s;
+  background: #fafafa;
+}
+
+.modal-field input:focus,
+.modal-field select:focus,
+.modal-field textarea:focus {
+  border-color: #C0152E;
+  background: white;
+}
+
+.modal-field textarea {
+  resize: vertical;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btn-cancel {
+  flex: 1;
+  padding: 12px;
+  background: #f5f5f5;
+  color: #666;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+  background: #e8e8e8;
+}
+
+.btn-save {
+  flex: 1;
+  padding: 12px;
+  background: #C0152E;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-save:hover {
+  background: #a01228;
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Admin Action Buttons */
+.admin-action-btn {
+  padding: 12px 20px;
+  background: white;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.admin-action-btn:hover {
+  border-color: #C0152E;
+  color: #C0152E;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(192, 21, 46, 0.1);
+}
+
+/* Mini Table for Admin */
+.admin-table-mini {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.admin-table-mini th {
+  padding: 8px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  text-align: left;
+  border-bottom: 1px solid #f0e0e2;
+}
+
+.admin-table-mini td {
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  color: #333;
+  border-bottom: 1px solid #f8f8f8;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.status-pending {
+  background: #fff8e1;
+  color: #f57f17;
+}
+
+.status-approved {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-rejected {
+  background: #ffebee;
+  color: #c62828;
+}
+
+.status-paid {
+  background: #e3f2fd;
+  color: #1565c0;
+}

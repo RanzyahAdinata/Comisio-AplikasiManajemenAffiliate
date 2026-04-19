@@ -1,0 +1,465 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+/* Campaign Tabs */
+.campaign-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.campaign-tab {
+  padding: 10px 22px;
+  border: 2px solid #e0e0e0;
+  border-radius: 50px;
+  background: white;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.campaign-tab:hover {
+  border-color: #C0152E;
+  color: #C0152E;
+}
+
+.campaign-tab.active {
+  background: #C0152E;
+  border-color: #C0152E;
+  color: white;
+}
+
+/* Campaign Grid */
+.campaign-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.campaign-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s;
+  border: 2px solid transparent;
+}
+
+.campaign-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: #C0152E;
+}
+
+.campaign-card.joined {
+  border-color: #27ae60;
+  background: #f8fff8;
+}
+
+.campaign-card-emoji {
+  font-size: 3rem;
+  margin-bottom: 12px;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f0f1;
+  border-radius: 16px;
+}
+
+.campaign-card-info {
+  flex: 1;
+  width: 100%;
+}
+
+.campaign-card-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 6px;
+}
+
+.campaign-card-category {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #888;
+  background: #f5f5f5;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.campaign-card-price {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #C0152E;
+  margin: 4px 0;
+}
+
+.campaign-card-commission {
+  font-size: 0.78rem;
+  color: #666;
+  margin: 4px 0 12px;
+}
+
+.campaign-card-commission strong {
+  color: #27ae60;
+}
+
+/* Join Button */
+.btn-join {
+  width: 100%;
+  padding: 10px;
+  background: #1A3A8C;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-join:hover {
+  background: #14306e;
+  transform: translateY(-1px);
+}
+
+.btn-join.btn-joined {
+  background: #27ae60;
+}
+
+.btn-join.btn-joined:hover {
+  background: #219a52;
+}
+
+.btn-join:disabled {
+  opacity: 0.6;
+  cursor: wait;
+  transform: none;
+}
+
+/* Campaign Empty */
+.campaign-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* My Campaigns List */
+.my-campaigns-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.my-campaign-card {
+  background: white;
+  border-radius: 16px;
+  padding: 20px 24px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  transition: all 0.2s;
+}
+
+.my-campaign-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+.my-campaign-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.product-emoji-large {
+  font-size: 2.2rem;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f0f1;
+  border-radius: 14px;
+  flex-shrink: 0;
+}
+
+.my-campaign-left h3 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 4px;
+}
+
+.my-campaign-cat {
+  font-size: 0.78rem;
+  color: #888;
+  margin: 0 0 2px;
+}
+
+.my-campaign-commission {
+  font-size: 0.78rem;
+  color: #27ae60;
+  font-weight: 700;
+  margin: 0;
+}
+
+.my-campaign-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.referral-code-box,
+.referral-link-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8f8f8;
+  padding: 6px 12px;
+  border-radius: 10px;
+  font-size: 0.78rem;
+}
+
+.referral-label {
+  color: #999;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.referral-code {
+  font-family: 'Courier New', monospace;
+  font-weight: 800;
+  color: #C0152E;
+  font-size: 0.88rem;
+}
+
+.referral-link-text {
+  color: #1A3A8C;
+  font-size: 0.72rem;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.btn-copy {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.88rem;
+  padding: 2px 4px;
+  transition: transform 0.1s;
+}
+
+.btn-copy:hover {
+  transform: scale(1.2);
+}
+
+/* Referral Modal */
+.referral-modal {
+  background: white;
+  border-radius: 24px;
+  padding: 36px;
+  width: 480px;
+  max-width: 92vw;
+  animation: slideUp 0.3s ease;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.25);
+  text-align: center;
+}
+
+.referral-modal-header {
+  margin-bottom: 24px;
+}
+
+.referral-modal-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.referral-modal-header h2 {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #111;
+  margin: 0 0 8px;
+}
+
+.referral-modal-header p {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0;
+}
+
+.referral-details {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.referral-detail-item {
+  flex: 1;
+  background: #f8f8f8;
+  border-radius: 12px;
+  padding: 12px;
+  text-align: center;
+}
+
+.detail-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.detail-value {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #111;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.detail-value.highlight {
+  color: #27ae60;
+  font-size: 1.1rem;
+}
+
+.referral-code-section {
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.referral-section-label {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #555;
+  margin: 0 0 8px;
+}
+
+.referral-code-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fdf0f2;
+  border: 2px dashed #C0152E;
+  border-radius: 14px;
+  padding: 14px 18px;
+}
+
+.referral-code-display span {
+  font-family: 'Courier New', monospace;
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #C0152E;
+  letter-spacing: 2px;
+}
+
+.referral-link-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #f0f4ff;
+  border: 2px dashed #1A3A8C;
+  border-radius: 14px;
+  padding: 14px 18px;
+}
+
+.referral-link-display span {
+  font-size: 0.78rem;
+  color: #1A3A8C;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.btn-copy-large {
+  padding: 6px 14px;
+  background: white;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-copy-large:hover {
+  border-color: #C0152E;
+  color: #C0152E;
+}
+
+.referral-tip {
+  font-size: 0.78rem;
+  color: #888;
+  background: #f8f8f8;
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin: 16px 0;
+  text-align: left;
+  line-height: 1.5;
+}
+
+.btn-close-modal {
+  width: 100%;
+  padding: 14px;
+  background: #C0152E;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-close-modal:hover {
+  background: #a01228;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .campaign-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+  }
+
+  .my-campaign-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .my-campaign-right {
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  .referral-details {
+    flex-direction: column;
+  }
+}

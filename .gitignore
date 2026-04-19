@@ -1,0 +1,9 @@
+# Abaikan node_modules di semua folder
+**/node_modules/
+frontend-comisio/node_modules/
+backend-comisio/node_modules/
+
+# Abaikan file lainnya
+.env
+dist/
+.DS_Store
