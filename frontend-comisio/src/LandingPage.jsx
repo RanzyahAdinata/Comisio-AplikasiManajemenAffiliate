@@ -14,10 +14,10 @@ export default function LandingPage({ navigate }) {
       <nav className="navbar">
         <div className="navbar-logo">
           {/* Mengganti teks lama dengan image logo */}
-          <img 
-            src={logoKami} 
-            alt="Logo Comis" 
-            style={{ height: "40px", width: "auto" }} 
+          <img
+            src={logoKami}
+            alt="Logo Comis"
+            style={{ height: "40px", width: "auto" }}
           />
         </div>
         <div className="navbar-links">
@@ -40,13 +40,13 @@ export default function LandingPage({ navigate }) {
       {/* Hero Section */}
       <section className="hero">
         <div className="hero-overlay" />
-        <motion.div 
+        <motion.div
           className="hero-content"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
-          <motion.h1 
+          <motion.h1
             className="hero-title"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -54,7 +54,7 @@ export default function LandingPage({ navigate }) {
           >
             Grow Your Career Through a High Impact Partnership
           </motion.h1>
-          <motion.p 
+          <motion.p
             className="hero-subtitle"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -62,7 +62,7 @@ export default function LandingPage({ navigate }) {
           >
             Scale your earnings with a precision engineered affiliate ecosystem. Comis.io bridges the gap between visionary brands and top tier partners, transforming every click into transparent, measurable revenue.
           </motion.p>
-          <motion.div 
+          <motion.div
             className="search-bar"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
