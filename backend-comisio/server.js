@@ -710,6 +710,24 @@ app.get('/api/notifications/:userId', async (req, res) => {
     }
 });
 
+app.post('/api/notifications', async (req, res) => {
+    const { user_id, title, message, type } = req.body;
+    try {
+        // If user_id is empty string from Postman, convert it to null to avoid UUID error
+        const validUserId = user_id && user_id.trim() !== '' ? user_id : null;
+        const notifId = crypto.randomUUID();
+        await pool.query(
+            `INSERT INTO notifications (id, user_id, title, message, type, is_read, created_at)
+             VALUES ($1, $2, $3, $4, $5, false, NOW())`,
+            [notifId, validUserId, title || 'System Notification', message || 'New notification received.', type || 'info']
+        );
+        res.status(201).json({ success: true, message: 'Notifikasi berhasil ditambahkan', notification_id: notifId });
+    } catch (err) {
+        console.error('Error add notification:', err);
+        res.status(500).json({ success: false, message: 'Gagal menambah notifikasi' });
+    }
+});
+
 app.put('/api/notifications/:id/read', async (req, res) => {
     try {
         const { id } = req.params;

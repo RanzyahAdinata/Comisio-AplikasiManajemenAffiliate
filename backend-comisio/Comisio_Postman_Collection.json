@@ -1,0 +1,864 @@
+{
+  "info": {
+    "name": "Comisio API (Full Automation)",
+    "description": "Koleksi API Comis.io lengkap dengan Automation Scripts agar semua request (POST, GET, PUT, DELETE) bisa langsung di-test dan menghasilkan response 200/201 (Sesuai output yang diharapkan).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5005",
+      "type": "string"
+    },
+    {
+      "key": "productId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "campaignId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "schemeId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "affiliateId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "payoutId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Utilities & Seeders",
+      "item": [
+        {
+          "name": "Run Database Migration",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/migrate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "migrate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Seed Admin",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/seed-admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "seed-admin"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Seed Products (30+ Products)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/seed-products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "seed-products"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Registrasi & Login",
+      "item": [
+        {
+          "name": "Submit Registration",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.success && jsonData.user) {",
+                  "    pm.collectionVariables.set(\"userId\", jsonData.user.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Affiliate\",\n  \"lastName\": \"Test\",\n  \"email\": \"affiliate_{{$timestamp}}@comisio.com\",\n  \"password\": \"password123\",\n  \"role\": \"affiliate\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/signup",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "signup"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Login Akun (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@comisio.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Manajemen Produk",
+      "item": [
+        {
+          "name": "List Produk",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Tambah Produk",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.success && jsonData.product) {",
+                  "    pm.collectionVariables.set(\"productId\", jsonData.product.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sepatu Nike {{$timestamp}}\",\n  \"price\": 1200000,\n  \"category\": \"Fashion\",\n  \"image_url\": \"👟\",\n  \"description\": \"Sepatu lari yang sangat nyaman.\",\n  \"commission_rate\": 15\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Produk",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sepatu Nike Pro Update\",\n  \"price\": 1350000,\n  \"category\": \"Fashion\",\n  \"image_url\": \"👟\",\n  \"description\": \"Update deskripsi produk.\",\n  \"commission_rate\": 20\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "{{productId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Hapus Produk",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/products/{{productId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "products",
+                "{{productId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Affiliates Data",
+      "item": [
+        {
+          "name": "Get All Affiliates",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.success && jsonData.affiliates.length > 0) {",
+                  "    pm.collectionVariables.set(\"affiliateId\", jsonData.affiliates[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/affiliates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affiliates"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Affiliate Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"active\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/affiliates/{{affiliateId}}/status",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "affiliates",
+                "{{affiliateId}}",
+                "status"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Campaigns & Referrals",
+      "item": [
+        {
+          "name": "Add Campaign",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.success && jsonData.campaign) {",
+                  "    pm.collectionVariables.set(\"campaignId\", jsonData.campaign.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"campaignName\": \"Promo Flash Sale {{$timestamp}}\",\n  \"productUrl\": \"https://comisio.com/promo\",\n  \"commissionRate\": 25\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Join Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"affiliate_id\": \"{{affiliateId}}\",\n  \"product_id\": \"{{campaignId}}\",\n  \"affiliate_name\": \"Tester\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns",
+                "join"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Campaigns by Affiliate",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/campaigns/{{affiliateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "campaigns",
+                "{{affiliateId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Record Referral Click",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referral_code\": \"TEST-123\",\n  \"ip_address\": \"192.168.1.1\",\n  \"user_agent\": \"PostmanRuntime\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/referral-click",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "referral-click"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Wallets & Commissions",
+      "item": [
+        {
+          "name": "Get Wallet Info",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/wallets/{{affiliateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "wallets",
+                "{{affiliateId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Commissions Info",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/commissions/{{affiliateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commissions",
+                "{{affiliateId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Payouts (Penarikan Dana)",
+      "item": [
+        {
+          "name": "Request Payout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"affiliate_id\": \"{{affiliateId}}\",\n  \"amount\": 50000,\n  \"bank_name\": \"BCA\",\n  \"account_number\": \"1234567890\",\n  \"account_holder\": \"Nama Tester\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payouts/request",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payouts",
+                "request"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Payouts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.success && jsonData.payouts.length > 0) {",
+                  "    pm.collectionVariables.set(\"payoutId\", jsonData.payouts[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/payouts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payouts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Payouts by Affiliate",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/payouts/affiliate/{{affiliateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payouts",
+                "affiliate",
+                "{{affiliateId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Approve Payout",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/payouts/{{payoutId}}/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payouts",
+                "{{payoutId}}",
+                "approve"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reject Payout",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/payouts/{{payoutId}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "payouts",
+                "{{payoutId}}",
+                "reject"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Commission Schemes",
+      "item": [
+        {
+          "name": "Tambah Scheme",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.success && jsonData.scheme) {",
+                  "    pm.collectionVariables.set(\"schemeId\", jsonData.scheme.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Skema Gold {{$timestamp}}\",\n  \"type\": \"percentage\",\n  \"value\": 30,\n  \"is_active\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/commission-schemes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commission-schemes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Schemes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/commission-schemes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commission-schemes"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Scheme",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Skema Gold Update\",\n  \"type\": \"percentage\",\n  \"value\": 35,\n  \"is_active\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/commission-schemes/{{schemeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commission-schemes",
+                "{{schemeId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Scheme",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/commission-schemes/{{schemeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "commission-schemes",
+                "{{schemeId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Dashboard & Notifications",
+      "item": [
+        {
+          "name": "Dashboard Admin",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/admin",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "admin"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Dashboard Affiliate",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/dashboard/affiliate/{{affiliateId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "dashboard",
+                "affiliate",
+                "{{affiliateId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Leaderboard",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/leaderboard",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "leaderboard"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Notification Request (Test)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.success && jsonData.notification_id) {",
+                  "    pm.collectionVariables.set(\"notificationId\", jsonData.notification_id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"user_id\": \"{{userId}}\",\n  \"title\": \"Test Notifikasi\",\n  \"message\": \"Ini adalah pesan notifikasi testing dari Postman.\",\n  \"type\": \"info\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Notifications by User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if(jsonData.success && jsonData.notifications.length > 0) {",
+                  "    pm.collectionVariables.set(\"notificationId\", jsonData.notifications[0].id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/{{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{userId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Notification as Read",
+          "request": {
+            "method": "PUT",
+            "url": {
+              "raw": "{{baseUrl}}/api/notifications/{{notificationId}}/read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{{notificationId}}",
+                "read"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
