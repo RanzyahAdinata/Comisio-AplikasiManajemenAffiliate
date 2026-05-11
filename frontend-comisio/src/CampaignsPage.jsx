@@ -8,7 +8,7 @@ import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
 import "./CampaignsPage.css";
 
-const API_URL = "https://comis-io-backend.vercel.app";
+const API_URL = "https://comis-io-kelompok-5.vercel.app";
 
 export default function CampaignsPage({ navigate }) {
   const [collapsed, setCollapsed] = useState(false);

@@ -5,7 +5,7 @@ import "./SignUpPage.css";
 import logoComis from "./assets/Logo_merah.png";
 import heroImage from "./assets/foto_signUp.jpg";
 
-const API_URL = "https://comis-io-backend.vercel.app";
+const API_URL = "https://comis-io-kelompok-5.vercel.app";
 
 export default function SignUpPage({ navigate }) {
   const [form, setForm] = useState({

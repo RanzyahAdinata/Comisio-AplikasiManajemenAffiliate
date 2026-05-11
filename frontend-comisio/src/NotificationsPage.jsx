@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import "./NotificationsPage.css";
 
-const API_URL = "https://comis-io-backend.vercel.app";
+const API_URL = "https://comis-io-kelompok-5.vercel.app";
 
 export default function NotificationsPage({ navigate }) {
   const [collapsed, setCollapsed] = useState(false);
