@@ -5,7 +5,7 @@ import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
 import "./DashboardPage.css";
 
-const API_URL = "http://localhost:5005";
+const API_URL = "https://comisio-app.vercel.app";
 
 export default function AdminDashboard({ navigate }) {
   const [collapsed, setCollapsed] = useState(false);

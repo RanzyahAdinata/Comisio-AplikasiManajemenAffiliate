@@ -6,7 +6,7 @@ import Sidebar from "./Sidebar";
 import "./ManageProduct.css";
 import "./CampaignsPage.css";
 
-const API_URL = "http://localhost:5005";
+const API_URL = "https://comisio-app.vercel.app";
 
 export default function MarketingPage({ navigate }) {
   const [collapsed, setCollapsed] = useState(false);

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import "./NotificationsPage.css";
 
-const API_URL = "http://localhost:5005";
+const API_URL = "https://comisio-app.vercel.app";
 
 export default function NotificationsPage({ navigate }) {
   const [collapsed, setCollapsed] = useState(false);
