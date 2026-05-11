@@ -5,7 +5,7 @@ import "./LoginPage.css";
 import logoComis from "./assets/Logo_merah.png";
 import heroImage from "./assets/foto_Login.jpg";
 
-const API_URL = "https://comisio-app.vercel.app";
+const API_URL = "https://comis-io-kelompok-5.vercel.app";
 
 export default function LoginPage({ navigate }) {
   const [form, setForm] = useState({ username: "", password: "" });

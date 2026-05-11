@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import "./NotificationIcon.css";
 
-const API_URL = "https://comisio-app.vercel.app";
+const API_URL = "https://comis-io-kelompok-5.vercel.app";
 
 export default function NotificationIcon({ navigate }) {
   const [unreadCount, setUnreadCount] = useState(0);
