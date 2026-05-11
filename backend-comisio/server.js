@@ -1109,3 +1109,4 @@ server.on('error', (error) => {
 process.on('uncaughtException', (err) => {
     console.error('🚨 Ada error tersembunyi yang bikin mati:', err);
 });
+module.exports = app;
