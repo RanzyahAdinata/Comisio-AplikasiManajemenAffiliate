@@ -146,7 +146,7 @@ app.post('/api/signup', async (req, res) => {
 
     } catch (err) {
         console.error('Error saat sign up:', err);
-        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server saat registrasi' });
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server saat registrasi', debug: err.message });
     }
 });
 
