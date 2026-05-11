@@ -2,6 +2,7 @@ const express = require('express');
 const { Pool } = require('pg');
 const cors = require('cors');
 const crypto = require('crypto');
+const bcrypt = require('bcrypt');
 
 const app = express();
 
@@ -61,10 +62,10 @@ app.post('/api/signup', async (req, res) => {
     if (!email || email.trim().length === 0) {
         errors.push('Email tidak boleh kosong.');
     } else {
-        // Validasi format email menggunakan regex standar
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email.trim())) {
-            errors.push('Format email tidak valid. Contoh yang benar: nama@domain.com');
+        // Validasi format email menggunakan regex untuk gmail
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailRegex.test(email.trim().toLowerCase())) {
+            errors.push('Format email tidak valid. Harus menggunakan @gmail.com');
         }
     }
 
@@ -97,7 +98,10 @@ app.post('/api/signup', async (req, res) => {
         const newUserId = crypto.randomUUID();
         const userRole = role || 'affiliate';
 
-        // 3. Masukkan data user baru ke database
+        // 3. Hash Password & Masukkan data user baru ke database
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+
         const insertQuery = `
             INSERT INTO users (id, first_name, last_name, email, password_hash, role) 
             VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, first_name, last_name, email, role
@@ -107,7 +111,7 @@ app.post('/api/signup', async (req, res) => {
             firstName.trim(),
             lastName.trim(),
             email.trim().toLowerCase(),
-            password,
+            hashedPassword,
             userRole
         ]);
 
@@ -162,7 +166,8 @@ app.post('/api/login', async (req, res) => {
         if (result.rows.length > 0) {
             const user = result.rows[0];
 
-            if (password === user.password_hash) {
+            const isMatch = await bcrypt.compare(password, user.password_hash);
+            if (isMatch) {
                 res.json({
                     success: true,
                     message: 'Login Berhasil',
@@ -1041,10 +1046,11 @@ app.post('/api/seed-admin', async (req, res) => {
         }
 
         const adminId = crypto.randomUUID();
+        const hashedAdminPassword = await bcrypt.hash('admin123', 10);
         await pool.query(
             `INSERT INTO users (id, first_name, last_name, email, password_hash, role) 
-             VALUES ($1, 'Admin', 'Comisio', 'admin@comisio.com', 'admin123', 'admin')`,
-            [adminId]
+             VALUES ($1, 'Admin', 'Comisio', 'admin@comisio.com', $2, 'admin')`,
+            [adminId, hashedAdminPassword]
         );
 
         res.json({ success: true, message: 'Admin account berhasil dibuat! Email: admin@comisio.com, Password: admin123' });
@@ -1060,10 +1066,11 @@ async function autoSeedAdmin() {
         const existing = await pool.query("SELECT id FROM users WHERE email='admin@comisio.com'");
         if (existing.rows.length === 0) {
             const adminId = crypto.randomUUID();
+            const hashedAdminPassword = await bcrypt.hash('admin123', 10);
             await pool.query(
                 `INSERT INTO users (id, first_name, last_name, email, password_hash, role) 
-                 VALUES ($1, 'Admin', 'Comisio', 'admin@comisio.com', 'admin123', 'admin')`,
-                [adminId]
+                 VALUES ($1, 'Admin', 'Comisio', 'admin@comisio.com', $2, 'admin')`,
+                [adminId, hashedAdminPassword]
             );
             console.log('✅ Admin account berhasil di-seed: admin@comisio.com / admin123');
         } else {

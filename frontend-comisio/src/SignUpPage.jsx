@@ -33,6 +33,14 @@ export default function SignUpPage({ navigate }) {
       setError("Semua field harus diisi!");
       return;
     }
+    
+    // Validasi Email Gmail
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    if (!emailRegex.test(form.email.trim().toLowerCase())) {
+      setError("Email harus berformat username@gmail.com!");
+      return;
+    }
+
     if (form.password !== form.confirmPassword) {
       setError("Password dan Confirm Password tidak cocok!");
       return;
@@ -101,22 +109,32 @@ export default function SignUpPage({ navigate }) {
               />
             </div>
 
-            <div className="input-group input-with-icon">
-              <span className="input-icon">✉️</span>
-              <input 
-                type="email" name="email" placeholder="Email"
-                value={form.email} onChange={handleChange}
-                className="form-input" disabled={loading} 
-              />
+            <div className="input-group input-with-icon" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div style={{ position: 'relative', width: '100%' }}>
+                <span className="input-icon">✉️</span>
+                <input 
+                  type="email" name="email" placeholder="Email"
+                  value={form.email} onChange={handleChange}
+                  className="form-input" disabled={loading} 
+                />
+              </div>
+              <span style={{ fontSize: '12px', color: '#666', marginTop: '6px', marginLeft: '16px' }}>
+                * Format: username@gmail.com
+              </span>
             </div>
 
-            <div className="input-group input-with-icon">
-              <span className="input-icon">🔒</span>
-              <input 
-                type="password" name="password" placeholder="Password"
-                value={form.password} onChange={handleChange}
-                className="form-input" disabled={loading} 
-              />
+            <div className="input-group input-with-icon" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div style={{ position: 'relative', width: '100%' }}>
+                <span className="input-icon">🔒</span>
+                <input 
+                  type="password" name="password" placeholder="Password"
+                  value={form.password} onChange={handleChange}
+                  className="form-input" disabled={loading} 
+                />
+              </div>
+              <span style={{ fontSize: '12px', color: '#666', marginTop: '6px', marginLeft: '16px' }}>
+                * Minimal 6 karakter
+              </span>
             </div>
 
             <div className="input-group input-with-icon">
