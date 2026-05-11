@@ -41,7 +41,7 @@ export default function DashboardPage({ navigate }) {
     const fetchData = async () => {
       if (user?.affiliateId) {
         try {
-          const res = await fetch(`https://comis-io-kelompok-5.vercel.app/api/dashboard/affiliate/${user.affiliateId}`);
+          const res = await fetch(`https://comis-io-backend.vercel.app/api/dashboard/affiliate/${user.affiliateId}`);
           const data = await res.json();
           if (data.success) {
             setStats(prev => ({ ...prev, ...data.stats }));
@@ -52,7 +52,7 @@ export default function DashboardPage({ navigate }) {
       }
       
       try {
-        const resLb = await fetch(`https://comis-io-kelompok-5.vercel.app/api/leaderboard`);
+        const resLb = await fetch(`https://comis-io-backend.vercel.app/api/leaderboard`);
         const dataLb = await resLb.json();
         if (dataLb.success) {
           setLeaderboard(dataLb.leaderboard);
