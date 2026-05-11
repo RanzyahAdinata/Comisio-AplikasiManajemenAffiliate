@@ -5,7 +5,7 @@ import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
 import "./ManageProduct.css";
 
-const API_URL = "https://comis-io-kelompok-5.vercel.app";
+const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
 
 export default function PayoutApproval({ navigate }) {
   const [collapsed, setCollapsed] = useState(false);
