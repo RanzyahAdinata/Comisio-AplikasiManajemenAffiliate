@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Mail, Lock, User } from "lucide-react";
 import "./SignUpPage.css";
 
 // 1. Import asset gambar
@@ -111,7 +112,7 @@ export default function SignUpPage({ navigate }) {
 
             <div className="input-group input-with-icon" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <div style={{ position: 'relative', width: '100%' }}>
-                <span className="input-icon">✉️</span>
+                <span className="input-icon"><Mail size={18} /></span>
                 <input 
                   type="email" name="email" placeholder="Email"
                   value={form.email} onChange={handleChange}
@@ -125,7 +126,7 @@ export default function SignUpPage({ navigate }) {
 
             <div className="input-group input-with-icon" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
               <div style={{ position: 'relative', width: '100%' }}>
-                <span className="input-icon">🔒</span>
+                <span className="input-icon"><Lock size={18} /></span>
                 <input 
                   type="password" name="password" placeholder="Password"
                   value={form.password} onChange={handleChange}
@@ -138,7 +139,7 @@ export default function SignUpPage({ navigate }) {
             </div>
 
             <div className="input-group input-with-icon">
-              <span className="input-icon">🔒</span>
+              <span className="input-icon"><Lock size={18} /></span>
               <input 
                 type="password" name="confirmPassword" placeholder="Confirm Password"
                 value={form.confirmPassword} onChange={handleChange}
@@ -147,7 +148,7 @@ export default function SignUpPage({ navigate }) {
             </div>
 
             <div className="input-group input-with-icon">
-              <span className="input-icon">👤</span>
+              <span className="input-icon"><User size={18} /></span>
               <select 
                 name="role" 
                 value={form.role} 

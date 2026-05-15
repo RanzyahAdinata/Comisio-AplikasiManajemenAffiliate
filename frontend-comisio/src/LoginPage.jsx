@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Mail, Lock } from "lucide-react";
 import "./LoginPage.css";
 
 // 1. Import asset gambar sesuai struktur folder Anda
@@ -88,7 +89,7 @@ export default function LoginPage({ navigate }) {
             {error && <div className="alert alert-error">{error}</div>}
             
             <div className="input-group input-with-icon">
-              <span className="input-icon">👤</span>
+              <span className="input-icon"><Mail size={18} /></span>
               <input 
                 type="text" 
                 name="username" 
@@ -101,7 +102,7 @@ export default function LoginPage({ navigate }) {
             </div>
             
             <div className="input-group input-with-icon">
-              <span className="input-icon">🔒</span>
+              <span className="input-icon"><Lock size={18} /></span>
               <input 
                 type="password" 
                 name="password" 
