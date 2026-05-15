@@ -457,7 +457,7 @@
 .btn-close-modal {
   width: 100%;
   padding: 14px;
-  background: #111;
+  background: #C0152E;
   color: white;
   border: none;
   border-radius: 10px;
@@ -469,7 +469,7 @@
 }
 
 .btn-close-modal:hover {
-  background: #333;
+  background: #a01024;
 }
 
 /* Responsive */
