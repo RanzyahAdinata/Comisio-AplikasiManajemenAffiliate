@@ -1046,6 +1046,53 @@ app.post('/api/migrate', async (req, res) => {
 });
 
 // ==========================================
+// POST fix-links - Perbaiki semua link referral lama di database
+// ==========================================
+app.post('/api/fix-links', async (req, res) => {
+    try {
+        const FRONTEND_URL = process.env.FRONTEND_URL || 'https://comis-io-kelompok-5-frontend.vercel.app';
+
+        // Cek semua link yang ada di database dulu
+        const before = await pool.query(`
+            SELECT COUNT(*) as total,
+                   COUNT(CASE WHEN referral_link LIKE '%comisio.com%' THEN 1 END) as wrong_links
+            FROM affiliate_campaigns
+        `);
+
+        // Fix di tabel affiliate_campaigns
+        const fixCampaigns = await pool.query(`
+            UPDATE affiliate_campaigns 
+            SET referral_link = REPLACE(referral_link, 'https://comisio.com', $1)
+            WHERE referral_link LIKE '%comisio.com%'
+            RETURNING id, referral_link
+        `, [FRONTEND_URL]);
+
+        // Fix di tabel affiliates
+        const fixAffiliates = await pool.query(`
+            UPDATE affiliates 
+            SET referral_link = REPLACE(referral_link, 'https://comisio.com', $1)
+            WHERE referral_link LIKE '%comisio.com%'
+            RETURNING id, referral_link
+        `, [FRONTEND_URL]);
+
+        res.json({
+            success: true,
+            message: 'Semua link referral berhasil diperbaiki!',
+            stats: {
+                before: before.rows[0],
+                campaigns_fixed: fixCampaigns.rowCount,
+                affiliates_fixed: fixAffiliates.rowCount,
+                new_domain: FRONTEND_URL
+            },
+            updated_campaigns: fixCampaigns.rows,
+            updated_affiliates: fixAffiliates.rows
+        });
+    } catch (err) {
+        console.error('Error fix-links:', err);
+        res.status(500).json({ success: false, message: 'Gagal fix links: ' + err.message });
+    }
+});
+
 // GET all affiliates (Admin)
 // ==========================================
 app.get('/api/affiliates', async (req, res) => {
