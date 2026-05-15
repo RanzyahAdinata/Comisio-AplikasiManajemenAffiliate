@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { 
   Shirt, Laptop, Sparkles, Home, Tent, 
-  Package, Pencil, Trash2 
+  Package, Pencil, Trash2, BookOpen, MonitorPlay, Code, FolderDown, Users
 } from "lucide-react";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
@@ -17,7 +17,6 @@ export default function ManageProduct({ navigate }) {
   const [showModal, setShowModal] = useState(false);
   const [editProduct, setEditProduct] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [seeding, setSeeding] = useState(false);
   const [schemes, setSchemes] = useState([]);
   const [form, setForm] = useState({
     name: "", price: "", category: "Fashion", image_url: "", description: "", commission_rate: "10"
@@ -59,25 +58,7 @@ export default function ManageProduct({ navigate }) {
     }
   };
 
-  const seedProducts = async () => {
-    setSeeding(true);
-    try {
-      // First migrate
-      await fetch(`${API_URL}/api/migrate`, { method: "POST" });
-      // Then seed
-      const res = await fetch(`${API_URL}/api/seed-products`, { method: "POST" });
-      const data = await res.json();
-      if (data.success) {
-        alert(data.message);
-        fetchProducts();
-      }
-    } catch (err) {
-      console.error("Error seeding:", err);
-      alert("Gagal seed produk. Pastikan backend berjalan.");
-    } finally {
-      setSeeding(false);
-    }
-  };
+
 
   const handleSubmit = async () => {
     if (!form.name || !form.price) {
@@ -148,13 +129,21 @@ export default function ManageProduct({ navigate }) {
     p.category.toLowerCase().includes(search.toLowerCase())
   );
 
-  const categories = ["Fashion", "Electronics", "Health & Beauty", "Home & Living", "Sports & Outdoor"];
+  const categories = [
+    "Fashion", "Electronics", "Health & Beauty", "Home & Living", "Sports & Outdoor",
+    "E-book", "E-course", "Software", "Digital Asset", "Membership"
+  ];
   const categoryIcons = {
     "Fashion": <Shirt size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />, 
     "Electronics": <Laptop size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />, 
     "Health & Beauty": <Sparkles size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />,
     "Home & Living": <Home size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />, 
-    "Sports & Outdoor": <Tent size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />
+    "Sports & Outdoor": <Tent size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />,
+    "E-book": <BookOpen size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />,
+    "E-course": <MonitorPlay size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />,
+    "Software": <Code size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />,
+    "Digital Asset": <FolderDown size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />,
+    "Membership": <Users size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />
   };
 
   const formatCurrency = (val) => "IDR " + Number(val || 0).toLocaleString("id-ID");
@@ -179,9 +168,6 @@ export default function ManageProduct({ navigate }) {
           <button className="btn-add-product" onClick={openAdd}>
             + Add Product
           </button>
-          <button className="btn-seed-product" onClick={seedProducts} disabled={seeding}>
-            {seeding ? "Seeding..." : "🌱 Seed 34 Products"}
-          </button>
           <span className="product-count">{products.length} products total</span>
         </div>
 
@@ -198,7 +184,7 @@ export default function ManageProduct({ navigate }) {
           {filteredProducts.length === 0 ? (
             <div className="empty-state glass-panel" style={{ gridColumn: '1 / -1' }}>
               {products.length === 0 
-                ? "Belum ada produk. Klik 'Seed 34 Products' untuk menambahkan produk otomatis." 
+                ? "Belum ada produk. Klik '+ Add Product' untuk menambahkan produk baru." 
                 : "Tidak ada produk yang cocok dengan pencarian."}
             </div>
           ) : (
