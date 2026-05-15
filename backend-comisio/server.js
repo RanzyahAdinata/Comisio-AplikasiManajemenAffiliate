@@ -1024,7 +1024,21 @@ app.post('/api/migrate', async (req, res) => {
             END $$;
         `);
 
-        res.json({ success: true, message: 'Migrasi database berhasil!' });
+        // Fix existing referral links that use the wrong comisio.com domain
+        await pool.query(`
+            UPDATE affiliate_campaigns 
+            SET referral_link = REPLACE(referral_link, 'https://comisio.com', 'https://comis-io-kelompok-5-frontend.vercel.app')
+            WHERE referral_link LIKE 'https://comisio.com%';
+        `);
+
+        // Fix existing affiliate profile referral links
+        await pool.query(`
+            UPDATE affiliates 
+            SET referral_link = REPLACE(referral_link, 'https://comisio.com', 'https://comis-io-kelompok-5-frontend.vercel.app')
+            WHERE referral_link LIKE 'https://comisio.com%';
+        `);
+
+        res.json({ success: true, message: 'Migrasi database berhasil dan link lama telah diperbaiki!' });
     } catch (err) {
         console.error('Error migration:', err);
         res.status(500).json({ success: false, message: 'Gagal migrasi: ' + err.message });
