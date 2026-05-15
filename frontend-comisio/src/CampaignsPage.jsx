@@ -15,6 +15,7 @@ const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
 export default function CampaignsPage({ navigate }) {
   const [collapsed, setCollapsed] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [products, setProducts] = useState([]);
   const [myCampaigns, setMyCampaigns] = useState([]);
   const [showReferralModal, setShowReferralModal] = useState(false);
@@ -155,9 +156,18 @@ export default function CampaignsPage({ navigate }) {
 
   const joinedProductIds = myCampaigns.map(c => c.product_id);
 
+  const allCategories = ["All", ...new Set(products.map(p => p.category))];
+
   const filteredProducts = products.filter(p =>
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
-    p.category.toLowerCase().includes(search.toLowerCase())
+    (selectedCategory === "All" || p.category === selectedCategory) &&
+    (p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.category.toLowerCase().includes(search.toLowerCase()))
+  );
+
+  const filteredMyCampaigns = myCampaigns.filter(c =>
+    (selectedCategory === "All" || c.category === selectedCategory) &&
+    (c.product_name.toLowerCase().includes(search.toLowerCase()) ||
+    (c.category && c.category.toLowerCase().includes(search.toLowerCase())))
   );
 
   const categoryIcons = {
@@ -195,6 +205,24 @@ export default function CampaignsPage({ navigate }) {
           <button className={`campaign-tab ${tab === 'joined' ? 'active' : ''}`} onClick={() => setTab('joined')} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <CheckCircle2 size={18} strokeWidth={1.5} /> My Campaigns ({myCampaigns.length})
           </button>
+        </div>
+
+        {/* Category Filters */}
+        <div className="category-filters">
+          {allCategories.map(cat => (
+            <button 
+              key={cat} 
+              className={`category-pill ${selectedCategory === cat ? 'active' : ''}`}
+              onClick={() => setSelectedCategory(cat)}
+            >
+              {cat === "All" ? "All Categories" : (
+                <>
+                  {categoryIcons[cat] || <Package size={14} strokeWidth={1.5} style={{ marginRight: '4px' }} />}
+                  {cat}
+                </>
+              )}
+            </button>
+          ))}
         </div>
 
         {tab === 'available' && (
@@ -264,12 +292,12 @@ export default function CampaignsPage({ navigate }) {
               visible: { opacity: 1, transition: { staggerChildren: 0.05 } }
             }}
           >
-            {myCampaigns.length === 0 ? (
+            {filteredMyCampaigns.length === 0 ? (
               <div className="campaign-empty glass-panel">
-                <p>Anda belum bergabung di campaign manapun. Klik "Join" pada produk yang tersedia.</p>
+                <p>Anda belum bergabung di campaign manapun (atau pencarian/kategori tidak cocok).</p>
               </div>
             ) : (
-              myCampaigns.map(campaign => (
+              filteredMyCampaigns.map(campaign => (
                 <motion.div key={campaign.id} className="my-campaign-card glass-panel" variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }}>
                   <div className="my-campaign-left">
                     <span className="product-emoji-large" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
