@@ -122,7 +122,7 @@ app.post('/api/signup', async (req, res) => {
         if (userRole === 'affiliate') {
             const affiliateId = crypto.randomUUID();
             const referralCode = generateReferralCode(firstName);
-            const FRONTEND_URL = process.env.FRONTEND_URL || 'https://comis-io-kelompok-5.vercel.app';
+            const FRONTEND_URL = process.env.FRONTEND_URL || 'https://comis-io-kelompok-5-frontend.vercel.app';
             const referralLink = `${FRONTEND_URL}/ref/${referralCode}`;
 
             await pool.query(
@@ -335,7 +335,7 @@ app.post('/api/campaigns/join', async (req, res) => {
 
         // Generate unique referral code untuk campaign ini
         const referralCode = generateReferralCode(affiliate_name || 'AFF');
-        const FRONTEND_URL = process.env.FRONTEND_URL || 'https://comis-io-kelompok-5.vercel.app';
+        const FRONTEND_URL = process.env.FRONTEND_URL || 'https://comis-io-kelompok-5-frontend.vercel.app';
         const referralLink = `${FRONTEND_URL}/buy/${referralCode}`;
         const campaignId = crypto.randomUUID();
 
