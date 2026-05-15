@@ -87,6 +87,9 @@ export default function CheckoutPage({ referralCode }) {
     customer_address: "",
   });
 
+  const [inputReferral, setInputReferral] = useState(referralCode || "");
+  const [discountApplied, setDiscountApplied] = useState(true);
+
   useEffect(() => {
     if (!referralCode) {
       setErrorMsg("Link referral tidak valid.");
@@ -121,6 +124,12 @@ export default function CheckoutPage({ referralCode }) {
   const handleBuyNow = () => {
     setStep("form");
     setFormErrors([]);
+  };
+
+  const handleApplyReferral = (e) => {
+    e.preventDefault();
+    if (!inputReferral) return;
+    window.location.href = `/buy/${inputReferral}`;
   };
 
   const handleSubmit = async (e) => {
@@ -161,6 +170,13 @@ export default function CheckoutPage({ referralCode }) {
 
   const formatCurrency = (val) =>
     "Rp " + Number(val || 0).toLocaleString("id-ID");
+
+  const getDiscountedPrice = (price) => {
+    return discountApplied ? price * 0.9 : price; // 10% discount
+  };
+  const getDiscountAmount = (price) => {
+    return discountApplied ? price * 0.1 : 0;
+  };
 
   // ─── LOADING ─────────────────────────────────────────────
   if (step === "loading") {
@@ -227,7 +243,7 @@ export default function CheckoutPage({ referralCode }) {
             </div>
             <div className="co-summary-row">
               <span className="co-summary-label">Total</span>
-              <span className="co-summary-value co-summary-total">{formatCurrency(orderResult?.amount)}</span>
+              <span className="co-summary-value co-summary-total">{formatCurrency(getDiscountedPrice(orderResult?.amount))}</span>
             </div>
             <div className="co-summary-row">
               <span className="co-summary-label">Email Konfirmasi</span>
@@ -281,7 +297,8 @@ export default function CheckoutPage({ referralCode }) {
               )}
 
               <div className="co-product-price-row">
-                <span className="co-product-price">{formatCurrency(product.price)}</span>
+                <span className="co-product-price" style={{ textDecoration: 'line-through', color: '#999', fontSize: '1rem', marginRight: '8px' }}>{formatCurrency(product.price)}</span>
+                <span className="co-product-price">{formatCurrency(getDiscountedPrice(product.price))}</span>
               </div>
 
               {campaign?.affiliate_name && (
@@ -293,7 +310,7 @@ export default function CheckoutPage({ referralCode }) {
 
               <button className="co-btn-primary" onClick={handleBuyNow}>
                 <IconCart size={18} color="#fff" />
-                Beli Sekarang — {formatCurrency(product.price)}
+                Beli Sekarang — {formatCurrency(getDiscountedPrice(product.price))}
               </button>
 
               <div className="co-trust-badges">
@@ -356,11 +373,41 @@ export default function CheckoutPage({ referralCode }) {
                 <span className="co-summary-value co-free">Gratis</span>
               </div>
 
+              {discountApplied && (
+                <div className="co-summary-row">
+                  <span className="co-summary-label" style={{ color: '#C0152E' }}>Diskon Referral (10%)</span>
+                  <span className="co-summary-value" style={{ color: '#C0152E' }}>- {formatCurrency(getDiscountAmount(product.price))}</span>
+                </div>
+              )}
+
+              <div className="co-divider" />
+
+              {/* Referral Input Box */}
+              <div className="co-referral-input-box" style={{ marginBottom: '16px' }}>
+                <label style={{ fontSize: '0.8rem', fontWeight: 600, color: '#555', display: 'block', marginBottom: '6px' }}>Punya Kode Referral Lain?</label>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <input 
+                    type="text" 
+                    value={inputReferral}
+                    onChange={(e) => setInputReferral(e.target.value)}
+                    placeholder="Masukkan kode..."
+                    style={{ flex: 1, padding: '8px 12px', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.85rem' }}
+                  />
+                  <button 
+                    type="button" 
+                    onClick={handleApplyReferral}
+                    style={{ background: '#1A3A8C', color: 'white', border: 'none', borderRadius: '6px', padding: '0 16px', fontSize: '0.85rem', fontWeight: 600, cursor: 'pointer' }}
+                  >
+                    Terapkan
+                  </button>
+                </div>
+              </div>
+
               <div className="co-divider" />
 
               <div className="co-summary-row co-summary-total-row">
                 <span className="co-summary-label">Total Pembayaran</span>
-                <span className="co-summary-value co-summary-total">{formatCurrency(product.price)}</span>
+                <span className="co-summary-value co-summary-total">{formatCurrency(getDiscountedPrice(product.price))}</span>
               </div>
 
               {campaign?.affiliate_name && (
@@ -478,7 +525,7 @@ export default function CheckoutPage({ referralCode }) {
                     ) : (
                       <>
                         <IconCheck size={16} color="#fff" />
-                        Pesan &amp; Bayar — {formatCurrency(product.price)}
+                        Pesan &amp; Bayar — {formatCurrency(getDiscountedPrice(product.price))}
                       </>
                     )}
                   </button>

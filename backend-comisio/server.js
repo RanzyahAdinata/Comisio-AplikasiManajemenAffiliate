@@ -1281,7 +1281,11 @@ app.post('/api/checkout', async (req, res) => {
         }
 
         const campaign = campaignRes.rows[0];
-        const productPrice = parseFloat(campaign.price);
+        const originalPrice = parseFloat(campaign.price);
+        
+        // Berikan diskon 10% karena menggunakan kode referral
+        const productPrice = originalPrice * 0.9;
+        
         const commissionRate = parseFloat(campaign.commission_rate || 10);
         const commissionAmount = (productPrice * commissionRate) / 100;
         const orderRef = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
