@@ -243,7 +243,7 @@ export default function CheckoutPage({ referralCode }) {
             </div>
             <div className="co-summary-row">
               <span className="co-summary-label">Total</span>
-              <span className="co-summary-value co-summary-total">{formatCurrency(getDiscountedPrice(orderResult?.amount))}</span>
+              <span className="co-summary-value co-summary-total">{formatCurrency(orderResult?.amount)}</span>
             </div>
             <div className="co-summary-row">
               <span className="co-summary-label">Email Konfirmasi</span>
