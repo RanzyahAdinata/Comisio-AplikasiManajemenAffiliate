@@ -19,6 +19,7 @@ export default function ReportsPage({ navigate }) {
     activeCampaigns: 0
   });
   const [campaigns, setCampaigns] = useState([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   let user;
   try {
@@ -67,54 +68,90 @@ export default function ReportsPage({ navigate }) {
 
   const maxClicks = Math.max(...monthlyData.map(d => d.clicks), 1);
 
-  const generatePDF = () => {
-    const doc = new jsPDF();
+  const generatePDF = async () => {
+    setIsGenerating(true);
+    let pdfStats = { ...stats };
+    let pdfCampaigns = [ ...campaigns ];
+
+    try {
+      const statsRes = await fetch(`${API_URL}/api/dashboard/affiliate/${user.affiliateId}`);
+      const statsData = await statsRes.json();
+      if (statsData.success) pdfStats = statsData.stats;
+
+      const campRes = await fetch(`${API_URL}/api/campaigns/${user.affiliateId}`);
+      const campData = await campRes.json();
+      if (campData.success) pdfCampaigns = campData.campaigns;
+    } catch (e) {
+      console.error("Failed to fetch fresh data for PDF:", e);
+    }
+
+    const doc = new jsPDF({ format: 'a4' });
     const currentDate = new Date().toLocaleDateString("id-ID", { day: '2-digit', month: 'long', year: 'numeric' });
 
-    // Header
-    doc.setFontSize(22);
-    doc.setTextColor(192, 21, 46); // #C0152E
-    doc.text("Comis.io", 14, 22);
+    // --- Header Background ---
+    doc.setFillColor(192, 21, 46); // #C0152E
+    doc.rect(0, 0, 210, 45, 'F');
+
+    // --- Header Text ---
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(28);
+    doc.setTextColor(255, 255, 255);
+    doc.text("Comis.io", 14, 20);
 
     doc.setFontSize(14);
-    doc.setTextColor(33, 33, 33);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(255, 255, 255);
     doc.text("Affiliate Performance Report", 14, 32);
 
+    // --- Affiliate Info Box ---
+    doc.setFillColor(245, 247, 250);
+    doc.rect(14, 55, 182, 25, 'F');
+    doc.setDrawColor(220, 225, 230);
+    doc.rect(14, 55, 182, 25, 'S');
+
     doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Generated on: ${currentDate}`, 14, 40);
-    doc.text(`Affiliate Name: ${user.name}`, 14, 46);
+    doc.setTextColor(80, 80, 80);
+    doc.text(`Report Date:`, 20, 64);
+    doc.text(`Affiliate Name:`, 20, 72);
+    
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(30, 30, 30);
+    doc.text(`${currentDate}`, 50, 64);
+    doc.text(`${user.name}`, 50, 72);
 
-    // Summary Stats
-    doc.setFontSize(12);
-    doc.setTextColor(33, 33, 33);
-    doc.text("Performance Summary", 14, 60);
+    // --- Performance Summary ---
+    doc.setFontSize(16);
+    doc.setTextColor(26, 58, 140); // Blue Theme for headings
+    doc.text("Performance Summary", 14, 95);
 
-    const conversionRate = stats.totalClicks > 0 ? ((stats.totalSales / stats.totalClicks) * 100).toFixed(1) : 0;
+    const conversionRate = pdfStats.totalClicks > 0 ? ((pdfStats.totalSales / pdfStats.totalClicks) * 100).toFixed(1) : 0;
 
     autoTable(doc, {
-      startY: 65,
+      startY: 100,
       head: [['Metric', 'Value']],
       body: [
-        ['Total Clicks', String(stats.totalClicks || 0)],
-        ['Total Sales', String(stats.totalSales || 0)],
+        ['Total Clicks', String(pdfStats.totalClicks || 0)],
+        ['Total Sales', String(pdfStats.totalSales || 0)],
         ['Conversion Rate', `${conversionRate}%`],
-        ['Active Campaigns', String(stats.activeCampaigns || 0)],
-        ['Wallet Balance', formatCurrency(stats.walletBalance)],
-        ['Pending Commissions', formatCurrency(stats.pendingCommissions)],
+        ['Active Campaigns', String(pdfStats.activeCampaigns || 0)],
+        ['Wallet Balance', formatCurrency(pdfStats.walletBalance)],
+        ['Pending Commissions', formatCurrency(pdfStats.pendingCommissions)],
       ],
-      theme: 'grid',
-      headStyles: { fillColor: [192, 21, 46] },
-      styles: { fontSize: 10 }
+      theme: 'plain',
+      headStyles: { fillColor: [240, 242, 245], textColor: [100, 100, 100], fontStyle: 'bold' },
+      bodyStyles: { borderBottomColor: [230, 230, 230], borderBottomWidth: 0.5 },
+      styles: { fontSize: 11, cellPadding: 6 },
+      alternateRowStyles: { fillColor: [252, 253, 255] }
     });
 
-    // Campaigns Table
-    doc.setFontSize(12);
-    doc.setTextColor(33, 33, 33);
-    doc.text("Active Campaigns", 14, doc.lastAutoTable.finalY + 15);
+    // --- Campaigns Table ---
+    doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(26, 58, 140);
+    doc.text("Active Campaigns", 14, doc.lastAutoTable.finalY + 20);
 
-    if (campaigns && campaigns.length > 0) {
-      const tableData = campaigns.map(c => [
+    if (pdfCampaigns && pdfCampaigns.length > 0) {
+      const tableData = pdfCampaigns.map(c => [
         c.product_name,
         c.category || '-',
         `${c.commission_rate || 0}%`,
@@ -122,23 +159,38 @@ export default function ReportsPage({ navigate }) {
       ]);
 
       autoTable(doc, {
-        startY: doc.lastAutoTable.finalY + 20,
+        startY: doc.lastAutoTable.finalY + 25,
         head: [['Product Name', 'Category', 'Commission', 'Referral Code']],
         body: tableData,
         theme: 'striped',
-        headStyles: { fillColor: [26, 58, 140] },
-        styles: { fontSize: 9 }
+        headStyles: { fillColor: [26, 58, 140], textColor: [255, 255, 255], fontStyle: 'bold' },
+        styles: { fontSize: 10, cellPadding: 5 },
+        alternateRowStyles: { fillColor: [245, 247, 250] }
       });
     } else {
-      doc.setFontSize(10);
-      doc.setTextColor(100, 100, 100);
-      doc.text("No active campaigns found.", 14, doc.lastAutoTable.finalY + 22);
+      doc.setFontSize(11);
+      doc.setFont("helvetica", "italic");
+      doc.setTextColor(120, 120, 120);
+      doc.text("No active campaigns found.", 14, doc.lastAutoTable.finalY + 30);
+    }
+
+    // --- Footer ---
+    const pageCount = doc.internal.getNumberOfPages();
+    for (let i = 1; i <= pageCount; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setFont("helvetica", "normal");
+      doc.setTextColor(150, 150, 150);
+      doc.text(
+        `Generated by Comis.io | Page ${i} of ${pageCount}`,
+        14,
+        doc.internal.pageSize.getHeight() - 10
+      );
     }
 
     const safeName = (user?.name || 'Affiliator').replace(/\s+/g, '_');
     const fileName = `Comisio_Report_${safeName}_${new Date().getTime()}.pdf`;
     
-    // Fallback to manual blob download to prevent random UUID filenames in some browsers
     const blob = doc.output('blob');
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -148,6 +200,8 @@ export default function ReportsPage({ navigate }) {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+    
+    setIsGenerating(false);
   };
 
   return (
@@ -160,10 +214,11 @@ export default function ReportsPage({ navigate }) {
           <div className="topbar-right">
             <button 
               onClick={generatePDF} 
+              disabled={isGenerating}
               className="btn-add-product" 
-              style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#1A3A8C' }}
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', background: isGenerating ? '#999' : '#1A3A8C', opacity: isGenerating ? 0.7 : 1, cursor: isGenerating ? 'wait' : 'pointer' }}
             >
-              <Download size={16} /> Download PDF
+              <Download size={16} /> {isGenerating ? "Generating..." : "Download PDF"}
             </button>
             <NotificationIcon navigate={navigate} />
           </div>
