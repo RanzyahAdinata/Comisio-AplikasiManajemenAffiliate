@@ -304,59 +304,60 @@ export default function CampaignsPage({ navigate }) {
         {/* Referral Code Modal */}
         {showReferralModal && referralData && (
           <div className="modal-overlay" onClick={() => setShowReferralModal(false)}>
-            <div className="referral-modal" style={{ background: "rgba(255, 255, 255, 0.98)", backdropFilter: "blur(30px)", border: "1px solid rgba(255,255,255,0.8)" }} onClick={e => e.stopPropagation()}>
+            <div className="referral-modal" onClick={e => e.stopPropagation()}>
               <div className="referral-modal-header">
-                <span className="referral-modal-icon" style={{ background: "rgba(198, 40, 40, 0.1)", color: "var(--primary)", display: "flex", alignItems: "center", justifyContent: "center", width: "48px", height: "48px", borderRadius: "50%", margin: "0 auto 12px" }}>
-                  <CheckCircle2 size={24} strokeWidth={2} />
-                </span>
-                <h2>{referralData.alreadyJoined ? "Your Referral Code" : "Campaign Joined!"}</h2>
+                <div className="referral-modal-icon-wrapper">
+                  <CheckCircle2 size={32} strokeWidth={2.5} />
+                </div>
+                <h2>{referralData.alreadyJoined ? "Your Referral Info" : "Campaign Joined!"}</h2>
                 <p>{referralData.alreadyJoined
-                  ? `Anda sudah bergabung di campaign ${referralData.productName}`
-                  : `Selamat! Anda berhasil bergabung di campaign ${referralData.productName}`
+                  ? `You are part of the ${referralData.productName} campaign.`
+                  : `Congratulations! You've joined the ${referralData.productName} campaign.`
                 }</p>
               </div>
 
-              <div className="referral-details">
-                <div className="referral-detail-item">
-                  <span className="detail-label">Product</span>
+              <div className="referral-details-modern">
+                <div className="detail-row">
+                  <span className="detail-label">Product Name</span>
                   <span className="detail-value">{referralData.productName}</span>
                 </div>
-                <div className="referral-detail-item">
-                  <span className="detail-label">Price</span>
+                <div className="detail-row">
+                  <span className="detail-label">Product Price</span>
                   <span className="detail-value">{formatCurrency(referralData.price)}</span>
                 </div>
-                <div className="referral-detail-item">
+                <div className="detail-row highlight-row">
                   <span className="detail-label">Your Commission</span>
-                  <span className="detail-value highlight" style={{ color: "var(--primary)", background: "rgba(198,40,40,0.1)" }}>{referralData.commissionRate}%</span>
+                  <span className="detail-value commission-value">{referralData.commissionRate}%</span>
                 </div>
               </div>
 
-              <div className="referral-code-section">
-                <p className="referral-section-label" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Package size={14} /> Your Referral Code</p>
-                <div className="referral-code-display" style={{ border: "1px solid rgba(198,40,40,0.2)", background: "rgba(198,40,40,0.05)" }}>
-                  <span style={{ color: "var(--primary)" }}>{referralData.referralCode}</span>
-                  <button className="btn-copy-large" onClick={() => copyToClipboard(referralData.referralCode)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    {copied ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy</>}
+              <div className="referral-copy-group">
+                <label><Tag size={14} /> Referral Code</label>
+                <div className="copy-input-wrapper">
+                  <input type="text" readOnly value={referralData.referralCode} />
+                  <button className="btn-copy-modern" onClick={() => copyToClipboard(referralData.referralCode)}>
+                    {copied ? <Check size={16} color="#27ae60" /> : <Copy size={16} />}
                   </button>
                 </div>
               </div>
 
-              <div className="referral-code-section">
-                <p className="referral-section-label" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Ticket size={14} /> Your Referral Link</p>
-                <div className="referral-link-display">
-                  <span>{referralData.referralLink}</span>
-                  <button className="btn-copy-large" onClick={() => copyToClipboard(referralData.referralLink)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    {copied ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy</>}
+              <div className="referral-copy-group">
+                <label><LinkIcon size={14} /> Referral Link</label>
+                <div className="copy-input-wrapper">
+                  <input type="text" readOnly value={referralData.referralLink} />
+                  <button className="btn-copy-modern" onClick={() => copyToClipboard(referralData.referralLink)}>
+                    {copied ? <Check size={16} color="#27ae60" /> : <Copy size={16} />}
                   </button>
                 </div>
               </div>
 
-              <p className="referral-tip">
-                💡 Bagikan kode referral atau link ini ke pembeli Anda. Setiap pembelian akan menghasilkan komisi untuk Anda!
-              </p>
+              <div className="referral-alert">
+                <Sparkles size={16} color="#b8940a" style={{ flexShrink: 0, marginTop: "2px" }} />
+                <span>Share this code or link with your audience. Every purchase through your link earns you commission!</span>
+              </div>
 
               <button className="btn-close-modal" onClick={() => setShowReferralModal(false)}>
-                Tutup
+                Close
               </button>
             </div>
           </div>
