@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Mail, Lock, User } from "lucide-react";
+import CustomSelect from "./CustomSelect";
 import "./SignUpPage.css";
 
 // 1. Import asset gambar
@@ -147,19 +148,17 @@ export default function SignUpPage({ navigate }) {
               />
             </div>
 
-            <div className="input-group input-with-icon">
-              <span className="input-icon"><User size={18} /></span>
-              <select 
-                name="role" 
-                value={form.role} 
+            <div className="input-group">
+              <CustomSelect 
+                name="role"
+                value={form.role}
                 onChange={handleChange}
-                className="form-input" 
-                disabled={loading}
-                style={{ appearance: "auto", cursor: "pointer" }}
-              >
-                <option value="affiliate">Affiliate</option>
-                <option value="admin">Admin</option>
-              </select>
+                options={[
+                  { label: "Affiliate", value: "affiliate" },
+                  { label: "Admin", value: "admin" }
+                ]}
+                icon={User}
+              />
             </div>
 
             <button className="btn-submit" onClick={handleSubmit} disabled={loading}>

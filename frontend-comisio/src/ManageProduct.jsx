@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
+import CustomSelect from "./CustomSelect";
 import "./ManageProduct.css";
 
 const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
@@ -243,12 +244,15 @@ export default function ManageProduct({ navigate }) {
                   <div className="modal-field">
                     <label>Commission Scheme</label>
                     {schemes.length > 0 ? (
-                      <select value={form.commission_rate} onChange={e => setForm({ ...form, commission_rate: e.target.value })}>
-                        <option value="10">Default (10%)</option>
-                        {schemes.map(s => (
-                          <option key={s.id} value={s.value}>{s.name} ({s.value}%)</option>
-                        ))}
-                      </select>
+                      <CustomSelect 
+                        name="commission_rate"
+                        value={form.commission_rate}
+                        onChange={e => setForm({ ...form, commission_rate: e.target.value })}
+                        options={[
+                          { label: "Default (10%)", value: "10" },
+                          ...schemes.map(s => ({ label: `${s.name} (${s.value}%)`, value: String(s.value) }))
+                        ]}
+                      />
                     ) : (
                       <input type="number" value={form.commission_rate} onChange={e => setForm({ ...form, commission_rate: e.target.value })} placeholder="10" />
                     )}
@@ -256,9 +260,12 @@ export default function ManageProduct({ navigate }) {
                 </div>
                 <div className="modal-field">
                   <label>Category</label>
-                  <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
-                    {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  <CustomSelect 
+                    name="category"
+                    value={form.category}
+                    onChange={e => setForm({ ...form, category: e.target.value })}
+                    options={categories.map(c => ({ label: c, value: c }))}
+                  />
                 </div>
                 <div className="modal-field">
                   <label>Emoji / Image URL</label>
