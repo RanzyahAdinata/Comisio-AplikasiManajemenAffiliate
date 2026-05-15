@@ -1250,7 +1250,8 @@ app.post('/api/checkout', async (req, res) => {
         customer_phone, 
         customer_address,
         product_id,
-        affiliate_id
+        affiliate_id,
+        apply_discount
     } = req.body;
 
     // Validasi input
@@ -1283,8 +1284,11 @@ app.post('/api/checkout', async (req, res) => {
         const campaign = campaignRes.rows[0];
         const originalPrice = parseFloat(campaign.price);
         
-        // Berikan diskon 5% karena menggunakan kode referral
-        const productPrice = originalPrice * 0.95;
+        let productPrice = originalPrice;
+        if (apply_discount) {
+            // Berikan diskon 5% karena pembeli menerapkan kode referral
+            productPrice = originalPrice * 0.95;
+        }
         
         const commissionRate = parseFloat(campaign.commission_rate || 10);
         const commissionAmount = (productPrice * commissionRate) / 100;
