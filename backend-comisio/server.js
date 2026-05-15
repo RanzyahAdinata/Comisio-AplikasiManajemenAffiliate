@@ -146,7 +146,7 @@ app.post('/api/signup', async (req, res) => {
 
     } catch (err) {
         console.error('Error saat sign up:', err);
-        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server saat registrasi', debug: err.message });
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server saat registrasi' });
     }
 });
 
@@ -992,6 +992,36 @@ app.post('/api/migrate', async (req, res) => {
             END $$;
         `);
 
+        // Create customers table (untuk pembeli via referral link)
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS customers (
+                id UUID PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) UNIQUE NOT NULL,
+                phone VARCHAR(20),
+                address TEXT,
+                created_at TIMESTAMP DEFAULT NOW()
+            )
+        `);
+
+        // Ensure customers has all needed columns
+        await pool.query(`
+            DO $$ BEGIN
+                ALTER TABLE customers ADD COLUMN IF NOT EXISTS phone VARCHAR(20);
+                ALTER TABLE customers ADD COLUMN IF NOT EXISTS address TEXT;
+                ALTER TABLE customers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW();
+            EXCEPTION WHEN OTHERS THEN NULL;
+            END $$;
+        `);
+
+        // Ensure transactions has customer_id column
+        await pool.query(`
+            DO $$ BEGIN
+                ALTER TABLE transactions ADD COLUMN IF NOT EXISTS customer_id UUID;
+            EXCEPTION WHEN OTHERS THEN NULL;
+            END $$;
+        `);
+
         res.json({ success: true, message: 'Migrasi database berhasil!' });
     } catch (err) {
         console.error('Error migration:', err);
@@ -1083,6 +1113,216 @@ async function autoSeedAdmin() {
         console.error('⚠️ Gagal auto-seed admin:', err.message);
     }
 }
+
+// ==========================================
+// BUYER / CHECKOUT ENDPOINTS
+// ==========================================
+
+// GET info produk via referral link (untuk halaman checkout pembeli)
+app.get('/api/buy/:referralCode', async (req, res) => {
+    const { referralCode } = req.params;
+    try {
+        // Cari campaign berdasarkan referral_code
+        const campaignResult = await pool.query(
+            `SELECT ac.id as campaign_id, ac.affiliate_id, ac.referral_code, ac.referral_link,
+                    p.id as product_id, p.name, p.price, p.description, p.image_url, p.category, p.commission_rate,
+                    u.first_name as affiliate_first_name, u.last_name as affiliate_last_name
+             FROM affiliate_campaigns ac
+             JOIN products p ON p.id = ac.product_id
+             JOIN affiliates a ON a.id = ac.affiliate_id
+             JOIN users u ON u.id = a.user_id
+             WHERE ac.referral_code = $1`,
+            [referralCode]
+        );
+
+        if (campaignResult.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Link referral tidak valid atau sudah kadaluarsa.' });
+        }
+
+        const campaign = campaignResult.rows[0];
+
+        // Catat referral click
+        try {
+            const clickId = crypto.randomUUID();
+            await pool.query(
+                `INSERT INTO referral_clicks (id, affiliate_id, ip_address, user_agent, clicked_at)
+                 VALUES ($1, $2, $3, $4, NOW())`,
+                [clickId, campaign.affiliate_id, req.ip || '', req.headers['user-agent'] || '']
+            );
+        } catch (clickErr) {
+            // Non-fatal: log but don't fail
+            console.warn('Warning: gagal catat referral click:', clickErr.message);
+        }
+
+        res.json({
+            success: true,
+            product: {
+                id: campaign.product_id,
+                name: campaign.name,
+                price: parseFloat(campaign.price),
+                description: campaign.description,
+                image_url: campaign.image_url,
+                category: campaign.category,
+                commission_rate: parseFloat(campaign.commission_rate || 10)
+            },
+            campaign: {
+                id: campaign.campaign_id,
+                referral_code: campaign.referral_code,
+                affiliate_id: campaign.affiliate_id,
+                affiliate_name: `${campaign.affiliate_first_name} ${campaign.affiliate_last_name}`.trim()
+            }
+        });
+    } catch (err) {
+        console.error('Error get buy info:', err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
+    }
+});
+
+// POST checkout - pembeli melakukan pemesanan
+app.post('/api/checkout', async (req, res) => {
+    const { 
+        referral_code, 
+        customer_name, 
+        customer_email, 
+        customer_phone, 
+        customer_address,
+        product_id,
+        affiliate_id
+    } = req.body;
+
+    // Validasi input
+    const errors = [];
+    if (!customer_name || customer_name.trim().length < 2) errors.push('Nama lengkap minimal 2 karakter.');
+    if (!customer_email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer_email)) errors.push('Format email tidak valid.');
+    if (!customer_phone || !/^[0-9+\-\s]{8,15}$/.test(customer_phone.trim())) errors.push('Nomor telepon tidak valid (8-15 digit).');
+    if (!customer_address || customer_address.trim().length < 5) errors.push('Alamat minimal 5 karakter.');
+    if (!referral_code) errors.push('Referral code tidak valid.');
+
+    if (errors.length > 0) {
+        return res.status(422).json({ success: false, message: 'Data tidak valid.', errors });
+    }
+
+    try {
+        // 1. Ambil data campaign + produk berdasarkan referral_code
+        const campaignRes = await pool.query(
+            `SELECT ac.id as campaign_id, ac.affiliate_id,
+                    p.id as product_id, p.name, p.price, p.commission_rate
+             FROM affiliate_campaigns ac
+             JOIN products p ON p.id = ac.product_id
+             WHERE ac.referral_code = $1`,
+            [referral_code]
+        );
+
+        if (campaignRes.rows.length === 0) {
+            return res.status(404).json({ success: false, message: 'Referral code tidak valid.' });
+        }
+
+        const campaign = campaignRes.rows[0];
+        const productPrice = parseFloat(campaign.price);
+        const commissionRate = parseFloat(campaign.commission_rate || 10);
+        const commissionAmount = (productPrice * commissionRate) / 100;
+        const orderRef = 'ORD-' + crypto.randomBytes(4).toString('hex').toUpperCase();
+
+        // 2. Simpan atau update customer
+        let customerId;
+        const existingCustomer = await pool.query(
+            `SELECT id FROM customers WHERE email = $1`,
+            [customer_email.trim().toLowerCase()]
+        );
+
+        if (existingCustomer.rows.length > 0) {
+            customerId = existingCustomer.rows[0].id;
+            // Update info terbaru customer
+            await pool.query(
+                `UPDATE customers SET name=$1, phone=$2, address=$3 WHERE id=$4`,
+                [customer_name.trim(), customer_phone.trim(), customer_address.trim(), customerId]
+            );
+        } else {
+            customerId = crypto.randomUUID();
+            await pool.query(
+                `INSERT INTO customers (id, name, email, phone, address, created_at)
+                 VALUES ($1, $2, $3, $4, $5, NOW())`,
+                [customerId, customer_name.trim(), customer_email.trim().toLowerCase(), customer_phone.trim(), customer_address.trim()]
+            );
+        }
+
+        // 3. Buat transaksi
+        const transactionId = crypto.randomUUID();
+        await pool.query(
+            `INSERT INTO transactions (id, customer_id, affiliate_id, order_reference, order_amount, status, created_at)
+             VALUES ($1, $2, $3, $4, $5, 'completed', NOW())`,
+            [transactionId, customerId, campaign.affiliate_id, orderRef, productPrice]
+        );
+
+        // 4. Buat record komisi
+        const commissionId = crypto.randomUUID();
+        await pool.query(
+            `INSERT INTO commissions (id, affiliate_id, transaction_id, commission_amount, status, created_at)
+             VALUES ($1, $2, $3, $4, 'approved', NOW())`,
+            [commissionId, campaign.affiliate_id, transactionId, commissionAmount]
+        );
+
+        // 5. Tambahkan komisi langsung ke wallet affiliator
+        const walletExists = await pool.query(
+            `SELECT id FROM wallets WHERE affiliate_id = $1`,
+            [campaign.affiliate_id]
+        );
+
+        if (walletExists.rows.length > 0) {
+            await pool.query(
+                `UPDATE wallets SET balance = balance + $1, updated_at = NOW() WHERE affiliate_id = $2`,
+                [commissionAmount, campaign.affiliate_id]
+            );
+        } else {
+            // Buat wallet baru jika belum ada
+            const walletId = crypto.randomUUID();
+            await pool.query(
+                `INSERT INTO wallets (id, affiliate_id, balance) VALUES ($1, $2, $3)`,
+                [walletId, campaign.affiliate_id, commissionAmount]
+            );
+        }
+
+        // 6. Kirim notifikasi ke affiliator
+        try {
+            const affiliateRes = await pool.query(
+                `SELECT user_id FROM affiliates WHERE id = $1`,
+                [campaign.affiliate_id]
+            );
+            if (affiliateRes.rows.length > 0) {
+                const notifId = crypto.randomUUID();
+                await pool.query(
+                    `INSERT INTO notifications (id, user_id, title, message, type, is_read, created_at)
+                     VALUES ($1, $2, $3, $4, $5, false, NOW())`,
+                    [
+                        notifId,
+                        affiliateRes.rows[0].user_id,
+                        '🎉 Penjualan Baru!',
+                        `${customer_name} baru saja membeli "${campaign.name}" via link Anda. Komisi Rp${commissionAmount.toLocaleString('id-ID')} telah masuk ke wallet Anda.`,
+                        'new_sale'
+                    ]
+                );
+            }
+        } catch (notifErr) {
+            console.warn('Warning: gagal kirim notifikasi:', notifErr.message);
+        }
+
+        res.status(201).json({
+            success: true,
+            message: 'Pemesanan berhasil! Terima kasih telah berbelanja.',
+            order: {
+                order_reference: orderRef,
+                product_name: campaign.name,
+                amount: productPrice,
+                customer_name: customer_name.trim(),
+                customer_email: customer_email.trim().toLowerCase()
+            }
+        });
+
+    } catch (err) {
+        console.error('Error checkout:', err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan saat memproses pemesanan. Silakan coba lagi.' });
+    }
+});
 
 // ==========================================
 // START SERVER
