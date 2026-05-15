@@ -172,10 +172,10 @@ export default function CheckoutPage({ referralCode }) {
     "Rp " + Number(val || 0).toLocaleString("id-ID");
 
   const getDiscountedPrice = (price) => {
-    return discountApplied ? price * 0.9 : price; // 10% discount
+    return discountApplied ? price * 0.95 : price; // 5% discount
   };
   const getDiscountAmount = (price) => {
-    return discountApplied ? price * 0.1 : 0;
+    return discountApplied ? price * 0.05 : 0;
   };
 
   // ─── LOADING ─────────────────────────────────────────────
@@ -375,7 +375,7 @@ export default function CheckoutPage({ referralCode }) {
 
               {discountApplied && (
                 <div className="co-summary-row">
-                  <span className="co-summary-label" style={{ color: '#C0152E' }}>Diskon Referral (10%)</span>
+                  <span className="co-summary-label" style={{ color: '#C0152E' }}>Diskon Referral (5%)</span>
                   <span className="co-summary-value" style={{ color: '#C0152E' }}>- {formatCurrency(getDiscountAmount(product.price))}</span>
                 </div>
               )}
