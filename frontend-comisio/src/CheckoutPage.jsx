@@ -98,8 +98,6 @@ export default function CheckoutPage({ referralCode }) {
   if (step === "loading") {
     return (
       <div className="co-page">
-        <div className="co-bg-blur co-bg-blur--1" />
-        <div className="co-bg-blur co-bg-blur--2" />
         <div className="co-card co-card--loading">
           <div className="co-spinner" />
           <p>Memuat informasi produk…</p>
@@ -112,12 +110,9 @@ export default function CheckoutPage({ referralCode }) {
   if (step === "error") {
     return (
       <div className="co-page">
-        <div className="co-bg-blur co-bg-blur--1" />
-        <div className="co-bg-blur co-bg-blur--2" />
         <div className="co-card co-card--error">
           <div className="co-logo">
-            <span className="co-logo-text">Comis</span>
-            <span className="co-logo-badge">.io</span>
+            <span className="co-logo-text">BeliDisiniAja</span>
           </div>
           <div className="co-error-icon">🔗</div>
           <h2>Link Tidak Valid</h2>
@@ -132,17 +127,20 @@ export default function CheckoutPage({ referralCode }) {
   if (step === "success") {
     return (
       <div className="co-page">
-        <div className="co-bg-blur co-bg-blur--1" />
-        <div className="co-bg-blur co-bg-blur--2" />
         <div className="co-card co-card--success">
           <div className="co-logo">
-            <span className="co-logo-text">Comis</span>
-            <span className="co-logo-badge">.io</span>
+            <span className="co-logo-text">BeliDisiniAja</span>
           </div>
           <div className="co-success-icon">
             <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="26" cy="26" r="25" stroke="#22c55e" strokeWidth="2"/>
-              <path d="M14 27l8 8 16-16" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <defs>
+                <linearGradient id="successGrad" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0%" stopColor="#4caf1e"/>
+                  <stop offset="100%" stopColor="#d4ac0d"/>
+                </linearGradient>
+              </defs>
+              <circle cx="26" cy="26" r="25" stroke="url(#successGrad)" strokeWidth="2"/>
+              <path d="M14 27l8 8 16-16" stroke="url(#successGrad)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <h2>Pesanan Berhasil! 🎉</h2>
@@ -172,7 +170,7 @@ export default function CheckoutPage({ referralCode }) {
           </p>
 
           <div className="co-powered">
-            Powered by <span className="co-logo-text" style={{ fontSize: "0.9rem" }}>Comis</span><span className="co-logo-badge" style={{ fontSize: "0.75rem", padding: "0 4px" }}>.io</span>
+            Powered by <span className="co-logo-text" style={{ fontSize: "0.85rem" }}>BeliDisiniAja</span>
           </div>
         </div>
       </div>
@@ -183,15 +181,11 @@ export default function CheckoutPage({ referralCode }) {
   if (step === "product") {
     return (
       <div className="co-page">
-        <div className="co-bg-blur co-bg-blur--1" />
-        <div className="co-bg-blur co-bg-blur--2" />
-
         <div className="co-container">
           {/* Header */}
           <div className="co-header">
             <div className="co-logo">
-              <span className="co-logo-text">Comis</span>
-              <span className="co-logo-badge">.io</span>
+              <span className="co-logo-text">BeliDisiniAja</span>
             </div>
             <p className="co-header-sub">Halaman Pembelian Produk</p>
           </div>
@@ -245,7 +239,7 @@ export default function CheckoutPage({ referralCode }) {
           </div>
 
           <div className="co-powered">
-            Powered by <span className="co-logo-text" style={{ fontSize: "0.9rem" }}>Comis</span><span className="co-logo-badge" style={{ fontSize: "0.75rem", padding: "0 4px" }}>.io</span>
+            Powered by <span className="co-logo-text" style={{ fontSize: "0.85rem" }}>BeliDisiniAja</span>
           </div>
         </div>
       </div>
@@ -256,15 +250,11 @@ export default function CheckoutPage({ referralCode }) {
   if (step === "form") {
     return (
       <div className="co-page">
-        <div className="co-bg-blur co-bg-blur--1" />
-        <div className="co-bg-blur co-bg-blur--2" />
-
         <div className="co-container">
           {/* Header */}
           <div className="co-header">
             <div className="co-logo">
-              <span className="co-logo-text">Comis</span>
-              <span className="co-logo-badge">.io</span>
+              <span className="co-logo-text">BeliDisiniAja</span>
             </div>
             <p className="co-header-sub">Lengkapi Data Pemesanan</p>
           </div>
