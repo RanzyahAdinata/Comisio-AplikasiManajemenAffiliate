@@ -326,13 +326,24 @@ export default function CheckoutPage({ referralCode }) {
                     onChange={(e) => setInputReferral(e.target.value)}
                     placeholder="Masukkan kode..."
                     disabled={discountApplied}
-                    style={{ flex: 1, padding: '10px 12px', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.9rem', outline: 'none' }}
+                    style={{ flex: 1, padding: '10px 12px', border: '1px solid #ccc', borderRadius: '6px', fontSize: '0.9rem', outline: 'none', fontFamily: "'Montserrat', sans-serif" }}
                   />
                   <button 
                     type="button" 
                     onClick={handleApplyReferral}
                     disabled={discountApplied}
-                    style={{ background: discountApplied ? '#4caf1e' : '#1A3A8C', color: 'white', border: 'none', borderRadius: '6px', padding: '0 16px', fontSize: '0.9rem', fontWeight: 600, cursor: discountApplied ? 'default' : 'pointer', transition: '0.3s' }}
+                    style={{ 
+                      background: discountApplied ? '#4caf1e' : 'linear-gradient(135deg, #4caf1e 0%, #c8a800 100%)', 
+                      color: 'white', 
+                      border: 'none', 
+                      borderRadius: '6px', 
+                      padding: '0 16px', 
+                      fontSize: '0.9rem', 
+                      fontWeight: 700, 
+                      cursor: discountApplied ? 'default' : 'pointer', 
+                      transition: '0.3s',
+                      fontFamily: "'Montserrat', sans-serif"
+                    }}
                   >
                     {discountApplied ? 'Berhasil ✓' : 'Terapkan'}
                   </button>
