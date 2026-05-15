@@ -135,7 +135,19 @@ export default function ReportsPage({ navigate }) {
       doc.text("No active campaigns found.", 14, doc.lastAutoTable.finalY + 22);
     }
 
-    doc.save(`Comisio_Report_${user.name.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
+    const safeName = (user?.name || 'Affiliator').replace(/\s+/g, '_');
+    const fileName = `Comisio_Report_${safeName}_${new Date().getTime()}.pdf`;
+    
+    // Fallback to manual blob download to prevent random UUID filenames in some browsers
+    const blob = doc.output('blob');
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
