@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { User, Check, X, Banknote, Calendar, CreditCard, Filter, Eye } from "lucide-react";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
+import Swal from "sweetalert2";
 import "./ManageProduct.css";
 
 const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
@@ -36,7 +37,16 @@ export default function PayoutApproval({ navigate }) {
   };
 
   const handleApprove = async (id) => {
-    if (!confirm("Approve payout ini?")) return;
+    const result = await Swal.fire({
+      title: "Approve Payout?",
+      text: "Yakin ingin menyetujui payout ini?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#27ae60",
+      cancelButtonColor: "#111",
+      confirmButtonText: "Ya, Setujui"
+    });
+    if (!result.isConfirmed) return;
     try {
       await fetch(`${API_URL}/api/payouts/${id}/approve`, { method: "PUT" });
       fetchPayouts();
@@ -46,7 +56,16 @@ export default function PayoutApproval({ navigate }) {
   };
 
   const handleReject = async (id) => {
-    if (!confirm("Reject payout ini?")) return;
+    const result = await Swal.fire({
+      title: "Reject Payout?",
+      text: "Yakin ingin menolak payout ini?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#c62828",
+      cancelButtonColor: "#111",
+      confirmButtonText: "Ya, Tolak"
+    });
+    if (!result.isConfirmed) return;
     try {
       await fetch(`${API_URL}/api/payouts/${id}/reject`, { method: "PUT" });
       fetchPayouts();

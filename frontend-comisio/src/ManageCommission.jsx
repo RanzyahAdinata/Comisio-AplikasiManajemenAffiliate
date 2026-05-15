@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
+import Swal from "sweetalert2";
 import "./ManageProduct.css";
 
 const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
@@ -44,7 +45,7 @@ export default function ManageCommission({ navigate }) {
 
   const handleSubmit = async () => {
     if (!form.name || !form.value) {
-      alert("Nama dan Value harus diisi!");
+      Swal.fire({ icon: "error", title: "Oops...", text: "Nama dan Value harus diisi!" });
       return;
     }
     setLoading(true);
@@ -77,7 +78,16 @@ export default function ManageCommission({ navigate }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Yakin ingin menghapus skema ini?")) return;
+    const result = await Swal.fire({
+      title: "Hapus Skema?",
+      text: "Yakin ingin menghapus skema ini?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#C0152E",
+      cancelButtonColor: "#111",
+      confirmButtonText: "Ya, hapus!"
+    });
+    if (!result.isConfirmed) return;
     try {
       await fetch(`${API_URL}/api/commission-schemes/${id}`, { method: "DELETE" });
       fetchSchemes();

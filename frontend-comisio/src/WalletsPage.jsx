@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { WalletCards, Banknote, Calendar, CreditCard } from "lucide-react";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
+import Swal from "sweetalert2";
 import "./ManageProduct.css";
 
 const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
@@ -54,15 +55,15 @@ export default function WalletsPage({ navigate }) {
 
   const handleRequestPayout = async () => {
     if (!form.amount || !form.bank_name || !form.account_number || !form.account_holder) {
-      alert("Semua field harus diisi!");
+      Swal.fire({ icon: "error", title: "Oops...", text: "Semua field harus diisi!" });
       return;
     }
     if (parseFloat(form.amount) > parseFloat(wallet.balance || 0)) {
-      alert("Saldo tidak mencukupi!");
+      Swal.fire({ icon: "error", title: "Oops...", text: "Saldo tidak mencukupi!" });
       return;
     }
     if (parseFloat(form.amount) < 50000) {
-      alert("Minimum payout IDR 50.000!");
+      Swal.fire({ icon: "error", title: "Oops...", text: "Minimum payout IDR 50.000!" });
       return;
     }
 
@@ -79,14 +80,14 @@ export default function WalletsPage({ navigate }) {
       });
       const data = await res.json();
       if (data.success) {
-        alert("Payout request berhasil diajukan! Tunggu persetujuan admin.");
+        Swal.fire({ icon: "success", title: "Berhasil", text: "Payout request berhasil diajukan! Tunggu persetujuan admin." });
         setShowRequestModal(false);
         setForm({ amount: "", bank_name: "", account_number: "", account_holder: "" });
         fetchPayouts();
       }
     } catch (err) {
       console.error("Error requesting payout:", err);
-      alert("Gagal memproses payout request.");
+      Swal.fire({ icon: "error", title: "Gagal", text: "Gagal memproses payout request." });
     } finally {
       setLoading(false);
     }

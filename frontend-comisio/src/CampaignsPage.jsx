@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
+import Swal from "sweetalert2";
 import "./CampaignsPage.css";
 
 const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
@@ -107,7 +108,7 @@ export default function CampaignsPage({ navigate }) {
   const handleJoin = async (product) => {
     const currentUser = userRef.current;
     if (!currentUser.affiliateId) {
-      alert("Anda belum terdaftar sebagai affiliate. Silakan logout dan login kembali.");
+      Swal.fire({ icon: "error", title: "Akses Ditolak", text: "Anda belum terdaftar sebagai affiliate. Silakan logout dan login kembali." });
       return;
     }
 
@@ -138,7 +139,7 @@ export default function CampaignsPage({ navigate }) {
       }
     } catch (err) {
       console.error("Error joining:", err);
-      alert("Gagal bergabung campaign.");
+      Swal.fire({ icon: "error", title: "Gagal", text: "Gagal bergabung campaign." });
     } finally {
       setJoining(null);
     }

@@ -7,6 +7,7 @@ import {
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
 import CustomSelect from "./CustomSelect";
+import Swal from "sweetalert2";
 import "./ManageProduct.css";
 
 const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
@@ -63,7 +64,7 @@ export default function ManageProduct({ navigate }) {
 
   const handleSubmit = async () => {
     if (!form.name || !form.price) {
-      alert("Nama dan Harga harus diisi!");
+      Swal.fire({ icon: "error", title: "Oops...", text: "Nama dan Harga harus diisi!" });
       return;
     }
     setLoading(true);
@@ -97,7 +98,16 @@ export default function ManageProduct({ navigate }) {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Yakin ingin menghapus produk ini?")) return;
+    const result = await Swal.fire({
+      title: "Hapus Produk?",
+      text: "Yakin ingin menghapus produk ini?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#C0152E",
+      cancelButtonColor: "#111",
+      confirmButtonText: "Ya, hapus!"
+    });
+    if (!result.isConfirmed) return;
     try {
       await fetch(`${API_URL}/api/products/${id}`, { method: "DELETE" });
       fetchProducts();
