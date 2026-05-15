@@ -122,7 +122,8 @@ app.post('/api/signup', async (req, res) => {
         if (userRole === 'affiliate') {
             const affiliateId = crypto.randomUUID();
             const referralCode = generateReferralCode(firstName);
-            const referralLink = `https://comisio.com/ref/${referralCode}`;
+            const FRONTEND_URL = process.env.FRONTEND_URL || 'https://comis-io-kelompok-5.vercel.app';
+            const referralLink = `${FRONTEND_URL}/ref/${referralCode}`;
 
             await pool.query(
                 `INSERT INTO affiliates (id, user_id, referral_code, referral_link, status) 
@@ -334,7 +335,8 @@ app.post('/api/campaigns/join', async (req, res) => {
 
         // Generate unique referral code untuk campaign ini
         const referralCode = generateReferralCode(affiliate_name || 'AFF');
-        const referralLink = `https://comisio.com/buy/${referralCode}`;
+        const FRONTEND_URL = process.env.FRONTEND_URL || 'https://comis-io-kelompok-5.vercel.app';
+        const referralLink = `${FRONTEND_URL}/buy/${referralCode}`;
         const campaignId = crypto.randomUUID();
 
         await pool.query(
