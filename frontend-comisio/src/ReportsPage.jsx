@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { TrendingUp, Target, BarChart2, Lightbulb } from "lucide-react";
+import { TrendingUp, Target, BarChart2, Lightbulb, Download } from "lucide-react";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
 import "./ManageProduct.css";
@@ -65,6 +67,77 @@ export default function ReportsPage({ navigate }) {
 
   const maxClicks = Math.max(...monthlyData.map(d => d.clicks), 1);
 
+  const generatePDF = () => {
+    const doc = new jsPDF();
+    const currentDate = new Date().toLocaleDateString("id-ID", { day: '2-digit', month: 'long', year: 'numeric' });
+
+    // Header
+    doc.setFontSize(22);
+    doc.setTextColor(192, 21, 46); // #C0152E
+    doc.text("Comis.io", 14, 22);
+
+    doc.setFontSize(14);
+    doc.setTextColor(33, 33, 33);
+    doc.text("Affiliate Performance Report", 14, 32);
+
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Generated on: ${currentDate}`, 14, 40);
+    doc.text(`Affiliate Name: ${user.name}`, 14, 46);
+
+    // Summary Stats
+    doc.setFontSize(12);
+    doc.setTextColor(33, 33, 33);
+    doc.text("Performance Summary", 14, 60);
+
+    const conversionRate = stats.totalClicks > 0 ? ((stats.totalSales / stats.totalClicks) * 100).toFixed(1) : 0;
+
+    autoTable(doc, {
+      startY: 65,
+      head: [['Metric', 'Value']],
+      body: [
+        ['Total Clicks', String(stats.totalClicks || 0)],
+        ['Total Sales', String(stats.totalSales || 0)],
+        ['Conversion Rate', `${conversionRate}%`],
+        ['Active Campaigns', String(stats.activeCampaigns || 0)],
+        ['Wallet Balance', formatCurrency(stats.walletBalance)],
+        ['Pending Commissions', formatCurrency(stats.pendingCommissions)],
+      ],
+      theme: 'grid',
+      headStyles: { fillColor: [192, 21, 46] },
+      styles: { fontSize: 10 }
+    });
+
+    // Campaigns Table
+    doc.setFontSize(12);
+    doc.setTextColor(33, 33, 33);
+    doc.text("Active Campaigns", 14, doc.lastAutoTable.finalY + 15);
+
+    if (campaigns && campaigns.length > 0) {
+      const tableData = campaigns.map(c => [
+        c.product_name,
+        c.category || '-',
+        `${c.commission_rate || 0}%`,
+        c.referral_code
+      ]);
+
+      autoTable(doc, {
+        startY: doc.lastAutoTable.finalY + 20,
+        head: [['Product Name', 'Category', 'Commission', 'Referral Code']],
+        body: tableData,
+        theme: 'striped',
+        headStyles: { fillColor: [26, 58, 140] },
+        styles: { fontSize: 9 }
+      });
+    } else {
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text("No active campaigns found.", 14, doc.lastAutoTable.finalY + 22);
+    }
+
+    doc.save(`Comisio_Report_${user.name.replace(/\s+/g, '_')}_${new Date().getTime()}.pdf`);
+  };
+
   return (
     <div className={`dashboard-layout ${collapsed ? "sidebar-collapsed" : ""}`}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} navigate={navigate} active="reports" user={user} />
@@ -73,6 +146,13 @@ export default function ReportsPage({ navigate }) {
         <div className="topbar">
           <h1 className="page-title">Reports</h1>
           <div className="topbar-right">
+            <button 
+              onClick={generatePDF} 
+              className="btn-add-product" 
+              style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#1A3A8C' }}
+            >
+              <Download size={16} /> Download PDF
+            </button>
             <NotificationIcon navigate={navigate} />
           </div>
         </div>
