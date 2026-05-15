@@ -213,7 +213,7 @@ export default function ManageCommission({ navigate }) {
         {/* Modal */}
         {showModal && (
           <div className="modal-overlay" onClick={() => setShowModal(false)}>
-            <div className="modal-content glass-bento-card" onClick={e => e.stopPropagation()}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
               <h2 className="modal-title">{editScheme ? "Edit Commission Scheme" : "Add Commission Scheme"}</h2>
               <div className="modal-form">
                 <div className="modal-field">

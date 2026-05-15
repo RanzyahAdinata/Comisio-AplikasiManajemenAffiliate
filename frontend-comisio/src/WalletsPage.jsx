@@ -194,7 +194,7 @@ export default function WalletsPage({ navigate }) {
         {/* Request Payout Modal */}
         {showRequestModal && (
           <div className="modal-overlay" onClick={() => setShowRequestModal(false)}>
-            <div className="modal-content glass-bento-card" onClick={e => e.stopPropagation()}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
               <h2 className="modal-title">Request Payout</h2>
               <p style={{ fontSize: "0.82rem", color: "#888", marginBottom: "16px" }}>
                 Saldo tersedia: <strong style={{ color: "#C0152E" }}>{formatCurrency(wallet.balance)}</strong>
