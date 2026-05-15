@@ -18,6 +18,7 @@ export default function ManageProduct({ navigate }) {
   const [editProduct, setEditProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [schemes, setSchemes] = useState([]);
   const [form, setForm] = useState({
     name: "", price: "", category: "Fashion", image_url: "", description: "", commission_rate: "10"
   });
@@ -32,6 +33,7 @@ export default function ManageProduct({ navigate }) {
 
   useEffect(() => {
     fetchProducts();
+    fetchSchemes();
   }, []);
 
   const fetchProducts = async () => {
@@ -41,6 +43,19 @@ export default function ManageProduct({ navigate }) {
       if (data.success) setProducts(data.products);
     } catch (err) {
       console.error("Error fetching products:", err);
+    }
+  };
+
+  const fetchSchemes = async () => {
+    try {
+      const res = await fetch(`${API_URL}/api/commission-schemes`);
+      const data = await res.json();
+      if (data.success) {
+        // Hanya ambil skema yang aktif dan tipe persentase
+        setSchemes(data.schemes.filter(s => s.is_active && s.type === 'percentage'));
+      }
+    } catch (err) {
+      console.error("Error fetching schemes:", err);
     }
   };
 
@@ -240,8 +255,17 @@ export default function ManageProduct({ navigate }) {
                     <input type="number" value={form.price} onChange={e => setForm({ ...form, price: e.target.value })} placeholder="0" />
                   </div>
                   <div className="modal-field">
-                    <label>Commission Rate (%)</label>
-                    <input type="number" value={form.commission_rate} onChange={e => setForm({ ...form, commission_rate: e.target.value })} placeholder="10" />
+                    <label>Commission Scheme</label>
+                    {schemes.length > 0 ? (
+                      <select value={form.commission_rate} onChange={e => setForm({ ...form, commission_rate: e.target.value })}>
+                        <option value="10">Default (10%)</option>
+                        {schemes.map(s => (
+                          <option key={s.id} value={s.value}>{s.name} ({s.value}%)</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input type="number" value={form.commission_rate} onChange={e => setForm({ ...form, commission_rate: e.target.value })} placeholder="10" />
+                    )}
                   </div>
                 </div>
                 <div className="modal-field">
