@@ -2,7 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
   Shirt, Laptop, Sparkles, Home, Tent, MonitorSmartphone,
-  Package, Search, Copy, Check, Ticket, CheckCircle2, ShoppingBag
+  Package, Search, Copy, Check, Ticket, CheckCircle2, ShoppingBag,
+  Tag, Link
 } from "lucide-react";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
@@ -342,7 +343,7 @@ export default function CampaignsPage({ navigate }) {
               </div>
 
               <div className="referral-copy-group">
-                <label><LinkIcon size={14} /> Referral Link</label>
+                <label><Link size={14} /> Referral Link</label>
                 <div className="copy-input-wrapper">
                   <input type="text" readOnly value={referralData.referralLink} />
                   <button className="btn-copy-modern" onClick={() => copyToClipboard(referralData.referralLink)}>
