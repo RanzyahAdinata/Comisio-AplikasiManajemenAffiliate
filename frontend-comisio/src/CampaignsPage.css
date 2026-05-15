@@ -497,11 +497,9 @@
 /* ── Category Filters ── */
 .category-filters {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
-  overflow-x: auto;
-  padding-bottom: 12px;
-  margin-bottom: 8px;
-  scrollbar-width: none; /* Firefox */
+  margin-bottom: 16px;
 }
 
 .category-filters::-webkit-scrollbar {
