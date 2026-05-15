@@ -12,8 +12,6 @@ export default function ManageAffiliates({ navigate }) {
   const [search, setSearch] = useState("");
   const [affiliates, setAffiliates] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [syncing, setSyncing] = useState(false);
-  const [syncMsg, setSyncMsg] = useState("");
 
   let user;
   try {
@@ -40,28 +38,7 @@ export default function ManageAffiliates({ navigate }) {
     }
   };
 
-  const syncAffiliates = async () => {
-    setSyncing(true);
-    setSyncMsg("");
-    try {
-      const res = await fetch(`${API_URL}/api/sync-affiliates`, {
-        method: "POST",
-      });
-      const data = await res.json();
-      if (data.success) {
-        setSyncMsg(`✅ ${data.message}`);
-        fetchAffiliates(); // Refresh the list
-      } else {
-        setSyncMsg(`❌ ${data.message}`);
-      }
-    } catch (err) {
-      console.error("Error syncing affiliates:", err);
-      setSyncMsg("❌ Sync failed. Server not responding.");
-    } finally {
-      setSyncing(false);
-      setTimeout(() => setSyncMsg(""), 5000);
-    }
-  };
+
 
   const toggleStatus = async (affiliateId, currentStatus) => {
     const newStatus = currentStatus === "active" ? "inactive" : "active";
@@ -106,49 +83,11 @@ export default function ManageAffiliates({ navigate }) {
         <div className="topbar">
           <h1 className="page-title">Manage Affiliates</h1>
           <div className="topbar-right">
-            <button
-              onClick={syncAffiliates}
-              disabled={syncing}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                padding: "8px 16px",
-                fontSize: "0.8rem",
-                borderRadius: "8px",
-                border: "none",
-                cursor: syncing ? "not-allowed" : "pointer",
-                fontWeight: 600,
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                color: "#fff",
-                marginRight: "12px",
-                opacity: syncing ? 0.7 : 1,
-                transition: "all 0.3s ease",
-              }}
-            >
-              <RefreshCw size={14} className={syncing ? "spin-icon" : ""} /> {syncing ? "Syncing..." : "Sync Affiliates"}
-            </button>
             <div className="search-box">
               <input type="text" placeholder="Search affiliates..." value={search} onChange={e => setSearch(e.target.value)} />
             </div>
           </div>
         </div>
-
-        {/* Sync Message */}
-        {syncMsg && (
-          <div style={{
-            padding: "10px 16px",
-            margin: "0 0 16px 0",
-            borderRadius: "8px",
-            background: syncMsg.startsWith("✅") ? "#d4edda" : "#f8d7da",
-            color: syncMsg.startsWith("✅") ? "#155724" : "#721c24",
-            fontSize: "0.85rem",
-            fontWeight: 500,
-            animation: "fadeIn 0.3s ease",
-          }}>
-            {syncMsg}
-          </div>
-        )}
 
         {/* Summary Cards */}
         <div className="stat-cards">
