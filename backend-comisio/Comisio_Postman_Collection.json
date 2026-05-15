@@ -859,6 +859,54 @@
           }
         }
       ]
+    },
+    {
+      "name": "9. Pembeli & Checkout",
+      "item": [
+        {
+          "name": "Get Data Produk (Referral)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/buy/TEST-123456",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "buy",
+                "TEST-123456"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Proses Checkout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"referralCode\": \"TEST-123456\",\n  \"customerData\": {\n    \"name\": \"Budi Pembeli\",\n    \"email\": \"budi@example.com\",\n    \"phone\": \"081234567890\",\n    \"address\": \"Jl. Sudirman No.1, Jakarta Pusat\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "checkout"
+              ]
+            }
+          }
+        }
+      ]
     }
   ]
 }
