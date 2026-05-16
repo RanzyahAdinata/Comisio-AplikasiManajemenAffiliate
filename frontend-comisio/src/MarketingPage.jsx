@@ -12,6 +12,11 @@ export default function MarketingPage({ navigate }) {
   const [collapsed, setCollapsed] = useState(false);
   const [campaigns, setCampaigns] = useState([]);
   const [copied, setCopied] = useState("");
+  const [expandedCards, setExpandedCards] = useState({});
+
+  const toggleExpand = (id) => {
+    setExpandedCards(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   let user;
   try {
@@ -95,7 +100,7 @@ export default function MarketingPage({ navigate }) {
           </div>
         ) : (
           <motion.div 
-            className="layered-container" style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+            className="layered-container" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}
             initial="hidden"
             animate="visible"
             variants={{
@@ -107,11 +112,11 @@ export default function MarketingPage({ navigate }) {
               <motion.div 
                 key={campaign.id} 
                 className="glass-panel" 
-                style={{ padding: "24px" }}
+                style={{ padding: "24px", display: "flex", flexDirection: "column" }}
                 variants={{ hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0 } }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: "16px", marginBottom: "20px" }}>
-                  <div style={{ background: "rgba(198, 40, 40, 0.05)", color: "var(--primary)", width: "60px", height: "60px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+                  <div style={{ background: "rgba(198, 40, 40, 0.05)", color: "var(--primary)", width: "60px", height: "60px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden", flexShrink: 0 }}>
                     {campaign.image_url ? (
                       campaign.image_url.startsWith('http') 
                         ? <img src={campaign.image_url} alt={campaign.product_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> 
@@ -119,7 +124,7 @@ export default function MarketingPage({ navigate }) {
                     ) : <Package size={32} strokeWidth={1.5} />}
                   </div>
                   <div>
-                    <h3 style={{ fontFamily: "'Montserrat'", fontWeight: 800, margin: "0 0 4px", color: "var(--text-dark)" }}>
+                    <h3 style={{ fontFamily: "'Montserrat'", fontWeight: 800, margin: "0 0 4px", color: "var(--text-dark)", fontSize: "1rem" }}>
                       {campaign.product_name}
                     </h3>
                     <p style={{ fontSize: "0.78rem", color: "var(--text-gray)", margin: 0 }}>
@@ -128,70 +133,99 @@ export default function MarketingPage({ navigate }) {
                   </div>
                 </div>
 
-                {/* Referral Links */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "20px" }}>
-                  <div style={{ background: "rgba(198,40,40,0.05)", border: "1px solid rgba(198,40,40,0.1)", borderRadius: "12px", padding: "14px" }}>
-                    <p style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-gray)", marginBottom: "6px" }}>REFERRAL CODE</p>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontFamily: "'Courier New'", fontWeight: 800, color: "var(--primary)", fontSize: "1.1rem" }}>
-                        {campaign.referral_code}
-                      </span>
-                      <button className="btn-copy" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "32px", height: "32px", padding: 0 }} onClick={() => copyToClipboard(campaign.referral_code, `code-${campaign.id}`)}>
-                        {copied === `code-${campaign.id}` ? <Check size={16} color="var(--primary)" /> : <Copy size={16} strokeWidth={1.5} />}
-                      </button>
-                    </div>
-                  </div>
-                  <div style={{ background: "rgba(26,58,140,0.05)", border: "1px solid rgba(26,58,140,0.1)", borderRadius: "12px", padding: "14px" }}>
-                    <p style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-gray)", marginBottom: "6px" }}>REFERRAL LINK</p>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span style={{ fontSize: "0.75rem", color: "#1A3A8C", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "200px" }}>
-                        {campaign.referral_link}
-                      </span>
-                      <button className="btn-copy" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "32px", height: "32px", padding: 0 }} onClick={() => copyToClipboard(campaign.referral_link, `link-${campaign.id}`)}>
-                        {copied === `link-${campaign.id}` ? <Check size={16} color="#1A3A8C" /> : <Copy size={16} strokeWidth={1.5} />}
-                      </button>
-                    </div>
+                {/* Always Visible: Referral Link */}
+                <div style={{ background: "rgba(26,58,140,0.05)", border: "1px solid rgba(26,58,140,0.1)", borderRadius: "12px", padding: "14px", marginBottom: "16px" }}>
+                  <p style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-gray)", marginBottom: "6px" }}>REFERRAL LINK</p>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: "0.75rem", color: "#1A3A8C", fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", maxWidth: "80%" }}>
+                      {campaign.referral_link}
+                    </span>
+                    <button className="btn-copy" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "32px", height: "32px", padding: 0 }} onClick={() => copyToClipboard(campaign.referral_link, `link-${campaign.id}`)}>
+                      {copied === `link-${campaign.id}` ? <Check size={16} color="#1A3A8C" /> : <Copy size={16} strokeWidth={1.5} />}
+                    </button>
                   </div>
                 </div>
 
-                {/* Marketing Templates */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
-                  {/* WhatsApp Template */}
-                  <div style={{ background: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.6)", borderRadius: "12px", padding: "16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-                      <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#25D366", display: "flex", alignItems: "center", gap: "6px" }}><Smartphone size={16} /> WhatsApp Template</span>
-                      <button className="btn-copy" style={{ display: "flex", alignItems: "center", gap: "4px" }} onClick={() => copyToClipboard(generateWhatsAppText(campaign), `wa-${campaign.id}`)}>
-                        {copied === `wa-${campaign.id}` ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy</>}
-                      </button>
-                    </div>
-                    <pre style={{
-                      fontSize: "0.72rem", color: "var(--text-dark)", whiteSpace: "pre-wrap",
-                      background: "rgba(255,255,255,0.6)", padding: "12px", borderRadius: "8px",
-                      border: "1px solid rgba(255,255,255,0.8)", fontFamily: "inherit", lineHeight: "1.5",
-                      margin: 0, maxHeight: "120px", overflow: "auto"
-                    }}>
-                      {generateWhatsAppText(campaign)}
-                    </pre>
-                  </div>
+                {/* View More Button */}
+                <button 
+                  onClick={() => toggleExpand(campaign.id)}
+                  style={{ 
+                    background: "transparent", 
+                    border: "1px solid var(--primary)", 
+                    color: "var(--primary)", 
+                    padding: "8px 16px", 
+                    borderRadius: "8px", 
+                    cursor: "pointer", 
+                    fontSize: "0.8rem", 
+                    fontWeight: "600", 
+                    alignSelf: "flex-start",
+                    marginBottom: expandedCards[campaign.id] ? "16px" : "0",
+                    transition: "all 0.2s ease"
+                  }}
+                  onMouseOver={(e) => { e.currentTarget.style.background = "var(--primary)"; e.currentTarget.style.color = "white"; }}
+                  onMouseOut={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--primary)"; }}
+                >
+                  {expandedCards[campaign.id] ? "View Less" : "View More"}
+                </button>
 
-                  {/* Instagram Template */}
-                  <div style={{ background: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.6)", borderRadius: "12px", padding: "16px" }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
-                      <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#E4405F", display: "flex", alignItems: "center", gap: "6px" }}><Camera size={16} /> Instagram Caption</span>
-                      <button className="btn-copy" style={{ display: "flex", alignItems: "center", gap: "4px" }} onClick={() => copyToClipboard(generateInstagramCaption(campaign), `ig-${campaign.id}`)}>
-                        {copied === `ig-${campaign.id}` ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy</>}
-                      </button>
+                {/* Expanded Content */}
+                {expandedCards[campaign.id] && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    style={{ display: "flex", flexDirection: "column", gap: "12px", overflow: "hidden" }}
+                  >
+                    {/* Referral Code */}
+                    <div style={{ background: "rgba(198,40,40,0.05)", border: "1px solid rgba(198,40,40,0.1)", borderRadius: "12px", padding: "14px" }}>
+                      <p style={{ fontSize: "0.72rem", fontWeight: 700, color: "var(--text-gray)", marginBottom: "6px" }}>REFERRAL CODE</p>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <span style={{ fontFamily: "'Courier New'", fontWeight: 800, color: "var(--primary)", fontSize: "1.1rem" }}>
+                          {campaign.referral_code}
+                        </span>
+                        <button className="btn-copy" style={{ display: "flex", alignItems: "center", justifyContent: "center", width: "32px", height: "32px", padding: 0 }} onClick={() => copyToClipboard(campaign.referral_code, `code-${campaign.id}`)}>
+                          {copied === `code-${campaign.id}` ? <Check size={16} color="var(--primary)" /> : <Copy size={16} strokeWidth={1.5} />}
+                        </button>
+                      </div>
                     </div>
-                    <pre style={{
-                      fontSize: "0.72rem", color: "var(--text-dark)", whiteSpace: "pre-wrap",
-                      background: "rgba(255,255,255,0.6)", padding: "12px", borderRadius: "8px",
-                      border: "1px solid rgba(255,255,255,0.8)", fontFamily: "inherit", lineHeight: "1.5",
-                      margin: 0, maxHeight: "120px", overflow: "auto"
-                    }}>
-                      {generateInstagramCaption(campaign)}
-                    </pre>
-                  </div>
-                </div>
+
+                    {/* WhatsApp Template */}
+                    <div style={{ background: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.6)", borderRadius: "12px", padding: "16px" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                        <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#25D366", display: "flex", alignItems: "center", gap: "6px" }}><Smartphone size={16} /> WhatsApp Template</span>
+                        <button className="btn-copy" style={{ display: "flex", alignItems: "center", gap: "4px" }} onClick={() => copyToClipboard(generateWhatsAppText(campaign), `wa-${campaign.id}`)}>
+                          {copied === `wa-${campaign.id}` ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy</>}
+                        </button>
+                      </div>
+                      <pre style={{
+                        fontSize: "0.72rem", color: "var(--text-dark)", whiteSpace: "pre-wrap",
+                        background: "rgba(255,255,255,0.6)", padding: "12px", borderRadius: "8px",
+                        border: "1px solid rgba(255,255,255,0.8)", fontFamily: "inherit", lineHeight: "1.5",
+                        margin: 0, maxHeight: "120px", overflow: "auto"
+                      }}>
+                        {generateWhatsAppText(campaign)}
+                      </pre>
+                    </div>
+
+                    {/* Instagram Template */}
+                    <div style={{ background: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.6)", borderRadius: "12px", padding: "16px" }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "10px" }}>
+                        <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "#E4405F", display: "flex", alignItems: "center", gap: "6px" }}><Camera size={16} /> Instagram Caption</span>
+                        <button className="btn-copy" style={{ display: "flex", alignItems: "center", gap: "4px" }} onClick={() => copyToClipboard(generateInstagramCaption(campaign), `ig-${campaign.id}`)}>
+                          {copied === `ig-${campaign.id}` ? <><Check size={14} /> Copied</> : <><Copy size={14} /> Copy</>}
+                        </button>
+                      </div>
+                      <pre style={{
+                        fontSize: "0.72rem", color: "var(--text-dark)", whiteSpace: "pre-wrap",
+                        background: "rgba(255,255,255,0.6)", padding: "12px", borderRadius: "8px",
+                        border: "1px solid rgba(255,255,255,0.8)", fontFamily: "inherit", lineHeight: "1.5",
+                        margin: 0, maxHeight: "120px", overflow: "auto"
+                      }}>
+                        {generateInstagramCaption(campaign)}
+                      </pre>
+                    </div>
+                  </motion.div>
+                )}
               </motion.div>
             ))}
           </motion.div>
