@@ -1,0 +1,197 @@
+@import './global.css';
+
+.landing-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Navbar ── */
+.navbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 48px;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.navbar .logo-text {
+  color: var(--white);
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  padding: 10px 28px;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 4px 12px;
+  border-radius: 50px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.navbar-links a:hover {
+  background: var(--primary);
+  color: var(--white);
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-signup {
+  padding: 12px 28px;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-signup:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-login {
+  padding: 12px 28px;
+  background: var(--white);
+  color: var(--text-dark);
+  border: none;
+  border-radius: 50px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-login:hover {
+  background: var(--bg-light);
+  transform: translateY(-1px);
+}
+
+/* ── Hero ── */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: url('./assets/LandingPage.png') center center / cover no-repeat;
+  /* Fallback gradient if no image */
+  background-color: #8b735500;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 1100px;
+  padding: 0 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.hero-title {
+  font-family: 'Montserrat', sans-serif;
+  /* Ukuran sedikit disesuaikan agar proporsional saat melebar */
+  font-size: clamp(2.5rem, 6vw, 5rem); 
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.1;
+  letter-spacing: -2px; /* Lebih rapat agar kesan modern/SaaS kuat */
+  text-align: center;
+  width: 100%;
+}
+
+.hero-subtitle {
+  font-size: 1.1rem; /* Sedikit diperbesar agar pas untuk 2 baris */
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
+  /* Max-width diatur spesifik agar teks "patah" tepat di baris kedua */
+  max-width: 800px; 
+  margin: 0 auto;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px) saturate(200%);
+  -webkit-backdrop-filter: blur(25px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  padding: 14px 24px;
+  width: 100%;
+  max-width: 520px;
+  gap: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+}
+
+.search-icon {
+  color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.95rem;
+  color: var(--white);
+  width: 100%;
+}
+
+.search-bar input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 16px 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .navbar-links {
+    display: none;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+}
