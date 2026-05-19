@@ -33,7 +33,7 @@ Rancangan UI aplikasi yang berfokus pada pengalaman pengguna.
 ## 🛠️ Stack Teknologi
 - **Frontend:** React.js
 - **Backend:** Node.js 
-- **Database:** MySQL
+- **Database:** PostgresSQL & Supabase (Online Database)
 
 ---
 
