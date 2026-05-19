@@ -197,6 +197,55 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ==========================================
+// ENDPOINT FORGOT PASSWORD
+// ==========================================
+app.post('/api/verify-email', async (req, res) => {
+    const { email } = req.body;
+    try {
+        if (!email) {
+            return res.status(400).json({ success: false, message: 'Email harus diisi' });
+        }
+        const query = `SELECT id FROM users WHERE email = $1`;
+        const result = await pool.query(query, [email.trim().toLowerCase()]);
+        
+        if (result.rows.length > 0) {
+            res.json({ success: true, message: 'Email ditemukan.' });
+        } else {
+            res.status(404).json({ success: false, message: 'Email tidak terdaftar.' });
+        }
+    } catch (err) {
+        console.error('Error verify email:', err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
+    }
+});
+
+app.post('/api/reset-password', async (req, res) => {
+    const { email, newPassword } = req.body;
+    try {
+        if (!newPassword || newPassword.length < 6) {
+            return res.status(422).json({ success: false, message: 'Password minimal 6 karakter.' });
+        }
+
+        const saltRounds = 10;
+        const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
+        const result = await pool.query(
+            `UPDATE users SET password_hash = $1 WHERE email = $2 RETURNING id`,
+            [hashedPassword, email.trim().toLowerCase()]
+        );
+
+        if (result.rows.length > 0) {
+            res.json({ success: true, message: 'Password berhasil direset.' });
+        } else {
+            res.status(404).json({ success: false, message: 'Email tidak terdaftar.' });
+        }
+    } catch (err) {
+        console.error('Error reset password:', err);
+        res.status(500).json({ success: false, message: 'Terjadi kesalahan pada server' });
+    }
+});
+
+// ==========================================
 // PRODUCTS ENDPOINTS
 // ==========================================
 

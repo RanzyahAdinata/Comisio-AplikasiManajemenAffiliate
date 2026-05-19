@@ -2,6 +2,8 @@ import { useState } from "react";
 import LandingPage from "./LandingPage";
 import SignUpPage from "./SignUpPage";
 import LoginPage from "./LoginPage";
+import ForgotPasswordPage from "./ForgotPasswordPage";
+import ResetPasswordPage from "./ResetPasswordPage";
 import DashboardPage from "./DashboardPage";
 import AdminDashboard from "./AdminDashboard";
 import ManageProduct from "./ManageProduct";
@@ -23,6 +25,8 @@ export default function App() {
       {currentPage === "landing" && <LandingPage navigate={navigate} />}
       {currentPage === "signup" && <SignUpPage navigate={navigate} />}
       {currentPage === "login" && <LoginPage navigate={navigate} />}
+      {currentPage === "forgot-password" && <ForgotPasswordPage navigate={navigate} />}
+      {currentPage === "reset-password" && <ResetPasswordPage navigate={navigate} />}
 
       {/* Affiliate Pages */}
       {currentPage === "dashboard" && <DashboardPage navigate={navigate} />}

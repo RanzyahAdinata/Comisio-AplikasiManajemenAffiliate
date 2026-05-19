@@ -114,6 +114,16 @@ export default function LoginPage({ navigate }) {
               />
             </div>
 
+            <div style={{ textAlign: "left", marginBottom: "20px" }}>
+              <span 
+                className="link" 
+                style={{ fontSize: "0.85rem", color: "#ff4f2a", cursor: "pointer", fontWeight: "600" }}
+                onClick={() => navigate("forgot-password")}
+              >
+                Forgot Password?
+              </span>
+            </div>
+
             <button className="btn-submit" onClick={handleSubmit} disabled={loading}>
               {loading ? "Memproses..." : "Login"}
             </button>
