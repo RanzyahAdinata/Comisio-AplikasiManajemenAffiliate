@@ -103,7 +103,7 @@ export default function DashboardPage({ navigate }) {
           </div>
           <div className="stat-divider"></div>
           <div className="stat-block">
-            <p className="stat-label">Pending Commisions</p>
+            <p className="stat-label">Pending Commissions</p>
             <h2 className="stat-value">{formatIDR(stats?.pendingCommissions ?? 0)}</h2>
             <p className="stat-note">{stats?.pendingOrdersCount ?? 0} orders</p>
           </div>
@@ -117,7 +117,7 @@ export default function DashboardPage({ navigate }) {
 
         <div className="dashboard-content-split">
           <div className="charts-column">
-            <h3 className="section-title">Commisions Earnings</h3>
+            <h3 className="section-title">Commissions Earnings</h3>
             <div className="grey-rounded-box charts-grey-box">
               <div className="chart-row">
                 <div className="chart-text-col">

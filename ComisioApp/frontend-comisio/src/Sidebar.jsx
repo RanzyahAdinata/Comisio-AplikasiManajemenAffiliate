@@ -10,7 +10,7 @@ import "./Sidebar.css";
 const affiliateMenuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "campaigns", label: "Campaigns", icon: ShoppingBag },
-  { id: "commisions", label: "Commisions", icon: Receipt },
+  { id: "commissions", label: "Commissions", icon: Receipt },
   { id: "wallets", label: "Wallets", icon: Wallet },
   { id: "reports", label: "Reports", icon: BarChart3 },
   { id: "marketing", label: "Marketing Assets", icon: Megaphone },
@@ -21,7 +21,7 @@ const adminMenuItems = [
   { id: "admin-dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "payout-approval", label: "Payout Approval", icon: CheckCircle },
   { id: "manage-product", label: "Manage Product", icon: Package },
-  { id: "manage-commission", label: "Manage Commision", icon: Percent },
+  { id: "manage-commission", label: "Manage Commission", icon: Percent },
   { id: "manage-affiliates", label: "Manage Affiliates", icon: Users },
 ];
 

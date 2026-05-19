@@ -41,11 +41,11 @@ export default function CommissionsPage({ navigate }) {
 
   return (
     <div className={`dashboard-layout ${collapsed ? "sidebar-collapsed" : ""}`}>
-      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} navigate={navigate} active="commisions" user={user} />
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} navigate={navigate} active="commissions" user={user} />
 
       <main className="dashboard-main">
         <div className="topbar">
-          <h1 className="page-title">Commisions</h1>
+          <h1 className="page-title">Commissions</h1>
           <div className="topbar-right">
             <div className="search-box">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#999" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

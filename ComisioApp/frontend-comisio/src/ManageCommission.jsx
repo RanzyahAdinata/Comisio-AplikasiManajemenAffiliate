@@ -123,7 +123,7 @@ export default function ManageCommission({ navigate }) {
 
       <main className="dashboard-main">
         <div className="topbar">
-          <h1 className="page-title">Manage Commision</h1>
+          <h1 className="page-title">Manage Commission</h1>
           <div className="topbar-right">
             <div className="search-box">
               <input type="text" placeholder="Search Scheme..." value={search} onChange={e => setSearch(e.target.value)} />

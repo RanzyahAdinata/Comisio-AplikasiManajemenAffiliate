@@ -31,7 +31,7 @@ export default function App() {
       {/* Affiliate Pages */}
       {currentPage === "dashboard" && <DashboardPage navigate={navigate} />}
       {currentPage === "campaigns" && <CampaignsPage navigate={navigate} />}
-      {currentPage === "commisions" && <CommissionsPage navigate={navigate} />}
+      {currentPage === "commissions" && <CommissionsPage navigate={navigate} />}
       {currentPage === "wallets" && <WalletsPage navigate={navigate} />}
       {currentPage === "reports" && <ReportsPage navigate={navigate} />}
       {currentPage === "marketing" && <MarketingPage navigate={navigate} />}
