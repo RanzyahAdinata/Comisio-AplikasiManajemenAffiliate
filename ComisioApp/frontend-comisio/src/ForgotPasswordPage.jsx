@@ -66,8 +66,8 @@ export default function ForgotPasswordPage({ navigate }) {
         </div>
 
         <div className="login-form-container">
-          <h2 className="login-title" style={{ fontSize: "2rem", marginBottom: "10px" }}>Forgot your password?</h2>
-          <p style={{ color: "#666", textAlign: "center", marginBottom: "30px", fontSize: "0.9rem" }}>
+          <h2 className="login-title" style={{ fontSize: "2rem", marginBottom: "10px", textAlign: "left" }}>Forgot your password?</h2>
+          <p style={{ color: "#666", textAlign: "left", marginBottom: "30px", fontSize: "0.9rem" }}>
             Enter your email so that we can send you password reset link
           </p>
 

@@ -102,10 +102,7 @@ export default function ResetPasswordPage({ navigate }) {
             </div>
           ) : (
             <>
-              <h2 className="login-title" style={{ fontSize: "2rem", marginBottom: "10px" }}>Reset password</h2>
-              <p style={{ color: "#666", textAlign: "center", marginBottom: "30px", fontSize: "0.9rem" }}>
-                Please kindly set your new password.
-              </p>
+              <h2 className="login-title" style={{ fontSize: "2rem", marginBottom: "30px", textAlign: "center" }}>Reset password</h2>
 
               <div className="login-form">
                 {error && <div className="alert alert-error">{error}</div>}
@@ -127,13 +124,13 @@ export default function ResetPasswordPage({ navigate }) {
                 </div>
 
                 <div style={{ marginBottom: "25px", textAlign: "left" }}>
-                  <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem", fontWeight: "600", color: "#333" }}>Re-enter password</label>
+                  <label style={{ display: "block", marginBottom: "5px", fontSize: "0.85rem", fontWeight: "600", color: "#333" }}>Confirm password</label>
                   <div className="input-group input-with-icon" style={{ margin: 0 }}>
                     <span className="input-icon"><Lock size={18} /></span>
                     <input 
                       type="password" 
                       name="confirmPassword" 
-                      placeholder="Re-enter your password"
+                      placeholder="Confirm your password"
                       value={confirmPassword} 
                       onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
                       className="form-input" 
