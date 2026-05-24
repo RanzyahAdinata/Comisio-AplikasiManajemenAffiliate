@@ -80,7 +80,7 @@ export default function AdminLoginPage({ navigate }) {
         </div>
 
         <div className="login-form-container">
-          <h2 className="login-title" style={{ color: "#c62828" }}>Admin Log In</h2>
+          <h2 className="login-title">Admin Log In</h2>
           <div className="login-form">
             {error && <div className="alert alert-error">{error}</div>}
             
