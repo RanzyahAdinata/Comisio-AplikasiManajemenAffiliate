@@ -2,13 +2,12 @@ import { useState } from "react";
 import { Mail, Lock } from "lucide-react";
 import "./LoginPage.css";
 
-// 1. Import asset gambar sesuai struktur folder Anda
 import logoComis from "./assets/Logo_merah.png";
 import heroImage from "./assets/foto_Login.jpg";
 
 const API_URL = "https://comis-io-kelompok-5-backend.vercel.app";
 
-export default function LoginPage({ navigate }) {
+export default function AdminLoginPage({ navigate }) {
   const [form, setForm] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -40,16 +39,13 @@ export default function LoginPage({ navigate }) {
       
       if (data.success) {
         if (data.user.role === 'admin') {
-          setError("Akun ini adalah Admin. Silakan login melalui Portal Admin.");
-          return;
+          // Simpan data user ke localStorage agar Dashboard bisa membacanya
+          localStorage.setItem("user", JSON.stringify(data.user));
+          navigate("admin-dashboard");
+          console.log(`Login Admin berhasil! Selamat datang, ${data.user.name}`);
+        } else {
+          setError("Akses Ditolak! Akun ini bukan milik Admin.");
         }
-
-        // Simpan data user ke localStorage agar Dashboard bisa membacanya
-        localStorage.setItem("user", JSON.stringify(data.user));
-        navigate("dashboard");
-        
-        console.log(`Login berhasil! Selamat datang, ${data.user.name}`);
-        
       } else {
         setError(data.message || "Login gagal, periksa email dan password.");
       }
@@ -68,6 +64,7 @@ export default function LoginPage({ navigate }) {
           src={heroImage} 
           alt="Login Hero" 
           className="hero-img-fill" 
+          style={{ filter: "brightness(0.7)" }} // Sedikit digelapkan untuk membedakan
         />
       </div>
 
@@ -83,7 +80,7 @@ export default function LoginPage({ navigate }) {
         </div>
 
         <div className="login-form-container">
-          <h2 className="login-title">Log In</h2>
+          <h2 className="login-title" style={{ color: "#c62828" }}>Admin Log In</h2>
           <div className="login-form">
             {error && <div className="alert alert-error">{error}</div>}
             
@@ -92,7 +89,7 @@ export default function LoginPage({ navigate }) {
               <input 
                 type="text" 
                 name="username" 
-                placeholder="Email"
+                placeholder="Admin Email"
                 value={form.username} 
                 onChange={handleChange}
                 className="form-input" 
@@ -113,27 +110,12 @@ export default function LoginPage({ navigate }) {
               />
             </div>
 
-            <div style={{ textAlign: "left", marginBottom: "20px" }}>
-              <span 
-                className="link" 
-                style={{ fontSize: "0.85rem", color: "#ff4f2a", cursor: "pointer", fontWeight: "600" }}
-                onClick={() => navigate("forgot-password")}
-              >
-                Forgot Password?
-              </span>
-            </div>
-
-            <button className="btn-submit" onClick={handleSubmit} disabled={loading}>
-              {loading ? "Memproses..." : "Login"}
+            <button className="btn-submit" onClick={handleSubmit} disabled={loading} style={{ marginTop: "10px", backgroundColor: "#c62828" }}>
+              {loading ? "Memproses..." : "Login to Admin Portal"}
             </button>
             
             <p className="signup-redirect">
-              don't have an account?{" "}
-              <span className="link" onClick={() => navigate("signup")}>Sign Up</span>
-            </p>
-            <p className="signup-redirect" style={{ marginTop: "5px" }}>
-              Are you an Admin?{" "}
-              <span className="link" onClick={() => navigate("admin-login")}>Admin Portal</span>
+              <span className="link" onClick={() => navigate("login")}>&larr; Back to Affiliate Login</span>
             </p>
           </div>
         </div>

@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Mail, Lock, User } from "lucide-react";
-import CustomSelect from "./CustomSelect";
+import { Mail, Lock } from "lucide-react";
 import "./SignUpPage.css";
 
 // 1. Import asset gambar
@@ -36,10 +35,10 @@ export default function SignUpPage({ navigate }) {
       return;
     }
     
-    // Validasi Email Gmail
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+    // Validasi Email Umum
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(form.email.trim().toLowerCase())) {
-      setError("Email harus berformat username@gmail.com!");
+      setError("Format email tidak valid (harus mengandung @ dan domain)!");
       return;
     }
 
@@ -121,7 +120,7 @@ export default function SignUpPage({ navigate }) {
                 />
               </div>
               <span style={{ fontSize: '12px', color: '#666', marginTop: '6px', marginLeft: '16px' }}>
-                * Format: username@gmail.com
+                * Contoh: nama@domain.com
               </span>
             </div>
 
@@ -148,18 +147,7 @@ export default function SignUpPage({ navigate }) {
               />
             </div>
 
-            <div className="input-group">
-              <CustomSelect 
-                name="role"
-                value={form.role}
-                onChange={handleChange}
-                options={[
-                  { label: "Affiliate", value: "affiliate" },
-                  { label: "Admin", value: "admin" }
-                ]}
-                icon={User}
-              />
-            </div>
+            {/* Role selection is removed, implicitly defaults to 'affiliate' in state */}
 
             <button className="btn-submit" onClick={handleSubmit} disabled={loading}>
               {loading ? "Memproses..." : "SignUp"}

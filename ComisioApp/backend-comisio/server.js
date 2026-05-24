@@ -65,10 +65,10 @@ app.post('/api/signup', async (req, res) => {
     if (!email || email.trim().length === 0) {
         errors.push('Email tidak boleh kosong.');
     } else {
-        // Validasi format email menggunakan regex untuk gmail
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        // Validasi format email (umum)
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email.trim().toLowerCase())) {
-            errors.push('Format email tidak valid. Harus menggunakan @gmail.com');
+            errors.push('Format email tidak valid.');
         }
     }
 

@@ -4,6 +4,7 @@ import SignUpPage from "./SignUpPage";
 import LoginPage from "./LoginPage";
 import ForgotPasswordPage from "./ForgotPasswordPage";
 import ResetPasswordPage from "./ResetPasswordPage";
+import AdminLoginPage from "./AdminLoginPage";
 import DashboardPage from "./DashboardPage";
 import AdminDashboard from "./AdminDashboard";
 import ManageProduct from "./ManageProduct";
@@ -27,6 +28,7 @@ export default function App() {
       {currentPage === "login" && <LoginPage navigate={navigate} />}
       {currentPage === "forgot-password" && <ForgotPasswordPage navigate={navigate} />}
       {currentPage === "reset-password" && <ResetPasswordPage navigate={navigate} />}
+      {currentPage === "admin-login" && <AdminLoginPage navigate={navigate} />}
 
       {/* Affiliate Pages */}
       {currentPage === "dashboard" && <DashboardPage navigate={navigate} />}
