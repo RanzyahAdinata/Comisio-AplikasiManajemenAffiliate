@@ -69,20 +69,20 @@ export default function MarketingPage({ navigate }) {
         </div>
 
         {/* Summary Stats */}
-        <div className="stat-cards" style={{ marginBottom: "20px" }}>
-          <div className="stat-card">
+        <div className="stat-cards" style={{ marginBottom: "20px", alignItems: "stretch" }}>
+          <div className="stat-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <p className="stat-label">Your Campaigns</p>
             <h2 className="stat-value">{campaigns.length}</h2>
             <p className="stat-note">Products to promote</p>
           </div>
-          <div className="stat-card">
+          <div className="stat-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <p className="stat-label">Referral Code</p>
-            <h2 className="stat-value" style={{ fontSize: "1rem", fontFamily: "'Courier New'" }}>
+            <h2 className="stat-value" style={{ fontSize: "1rem", fontFamily: "'Courier New'", wordBreak: "break-all" }}>
               {user.referralCode || 'N/A'}
             </h2>
             <p className="stat-note">Your main referral code</p>
           </div>
-          <div className="stat-card">
+          <div className="stat-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
             <p className="stat-label">Marketing Templates</p>
             <h2 className="stat-value">{campaigns.length * 2}</h2>
             <p className="stat-note">Ready to use</p>
@@ -92,9 +92,9 @@ export default function MarketingPage({ navigate }) {
         {campaigns.length === 0 ? (
           <div className="glass-panel" style={{ padding: "40px", textAlign: "center" }}>
             <p style={{ color: "#999", fontSize: "0.88rem" }}>
-              Anda belum bergabung di campaign manapun.
+              You haven't joined any campaign yet.
               <span className="stat-link" style={{ cursor: "pointer", marginLeft: "6px" }} onClick={() => navigate("campaigns")}>
-                Bergabunglah di Campaign →
+                Join a Campaign →
               </span>
             </p>
           </div>
@@ -163,7 +163,7 @@ export default function MarketingPage({ navigate }) {
                         transition: "all 0.2s", whiteSpace: "nowrap"
                       }}
                     >
-                      {isOpen ? <><ChevronUp size={15} /> Sembunyikan</> : <><ChevronDown size={15} /> Lihat Asset</>}
+                      {isOpen ? <><ChevronUp size={15} /> Hide Assets</> : <><ChevronDown size={15} /> View Assets</>}
                     </button>
                   </div>
 
