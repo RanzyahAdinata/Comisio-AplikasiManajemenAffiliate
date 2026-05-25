@@ -275,18 +275,18 @@ export default function ReportsPage({ navigate }) {
               </div>
 
               {/* Compact pill chart */}
-              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "6px", height: "56px" }}>
+              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "8px", height: "100px" }}>
                 {clickLabels.map((label, i) => {
                   const isPeak = i === clickValues.indexOf(Math.max(...clickValues));
                   const isLatest = i === clickLabels.length - 1;
                   const pct = maxClicks > 0 ? (clickValues[i] / maxClicks) * 100 : 10;
-                  const h = Math.max(pct, 12);
+                  const h = Math.max(pct, 15);
                   return (
-                    <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", flex: 1 }}>
-                      <span style={{ fontSize: "0.55rem", fontWeight: isPeak ? 700 : 500, color: isPeak ? "#C0152E" : "#bbb" }}>{clickValues[i]}</span>
+                    <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", flex: 1 }}>
+                      <span style={{ fontSize: "0.6rem", fontWeight: isPeak ? 700 : 500, color: isPeak ? "#C0152E" : "#bbb" }}>{clickValues[i]}</span>
                       <div style={{
-                        width: "14px", height: `${h}%`, minHeight: "6px",
-                        borderRadius: "6px",
+                        width: "20px", height: `${h}%`, minHeight: "10px",
+                        borderRadius: "8px",
                         background: isPeak
                           ? "linear-gradient(180deg, #C0152E, rgba(192,21,46,0.55))"
                           : "linear-gradient(180deg, #ccc, #e4e4e4)",
@@ -298,13 +298,13 @@ export default function ReportsPage({ navigate }) {
               </div>
 
               {/* Month labels + dot */}
-              <div style={{ display: "flex", justifyContent: "center", gap: "6px", marginTop: "4px" }}>
+              <div style={{ display: "flex", justifyContent: "center", gap: "8px", marginTop: "6px" }}>
                 {clickLabels.map((label, i) => {
                   const isLatest = i === clickLabels.length - 1;
                   return (
                     <div key={i} style={{ flex: 1, textAlign: "center" }}>
-                      {isLatest && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#C0152E", margin: "0 auto 2px" }} />}
-                      <span style={{ fontSize: "0.5rem", fontWeight: isLatest ? 700 : 400, color: isLatest ? "#C0152E" : "#bbb" }}>{label}</span>
+                      {isLatest && <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#C0152E", margin: "0 auto 2px" }} />}
+                      <span style={{ fontSize: "0.58rem", fontWeight: isLatest ? 700 : 400, color: isLatest ? "#C0152E" : "#bbb" }}>{label}</span>
                     </div>
                   );
                 })}
