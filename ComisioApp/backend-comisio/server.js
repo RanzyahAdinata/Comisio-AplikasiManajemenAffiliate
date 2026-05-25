@@ -815,7 +815,25 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
                     labels: monthLabels,
                     values: monthValues,
                     year: currentYear
-                }
+                },
+                clicksChart: await (async () => {
+                    const monthlyClicksRaw = await pool.query(
+                        `SELECT EXTRACT(MONTH FROM clicked_at)::int as month, COUNT(*) as count
+                         FROM referral_clicks
+                         WHERE affiliate_id=$1 AND clicked_at >= $2
+                         GROUP BY month ORDER BY month`,
+                        [affiliateId, yearStart]
+                    );
+                    const clickLabels = [];
+                    const clickValues = [];
+                    const MNAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+                    for (let m = 1; m <= currentMonth; m++) {
+                        clickLabels.push(MNAMES[m - 1]);
+                        const found = monthlyClicksRaw.rows.find(r => r.month === m);
+                        clickValues.push(found ? parseInt(found.count) : 0);
+                    }
+                    return { labels: clickLabels, values: clickValues, year: currentYear };
+                })()
             }
         });
     } catch (err) {

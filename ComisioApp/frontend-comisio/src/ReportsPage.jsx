@@ -16,7 +16,8 @@ export default function ReportsPage({ navigate }) {
     pendingCommissions: 0,
     totalClicks: 0,
     totalSales: 0,
-    activeCampaigns: 0
+    activeCampaigns: 0,
+    clicksChart: null
   });
   const [campaigns, setCampaigns] = useState([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -58,15 +59,14 @@ export default function ReportsPage({ navigate }) {
 
   const formatCurrency = (val) => "IDR " + Number(val || 0).toLocaleString("id-ID");
 
-  // Simple chart data
-  const monthlyData = [
-    { month: "Jan", clicks: 45, sales: 3 },
-    { month: "Feb", clicks: 68, sales: 5 },
-    { month: "Mar", clicks: 92, sales: 8 },
-    { month: "Apr", clicks: stats.totalClicks || 120, sales: stats.totalSales || 12 },
-  ];
-
-  const maxClicks = Math.max(...monthlyData.map(d => d.clicks), 1);
+  // Real-time monthly clicks from backend
+  const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const now = new Date();
+  const currentMonth = now.getMonth(); // 0-based
+  const chartYear = stats?.clicksChart?.year || now.getFullYear();
+  const clickLabels = stats?.clicksChart?.labels || MONTH_NAMES.slice(0, currentMonth + 1);
+  const clickValues = stats?.clicksChart?.values || clickLabels.map(() => 0);
+  const maxClicks = Math.max(...clickValues, 1);
 
   const generatePDF = async () => {
     setIsGenerating(true);
@@ -267,25 +267,80 @@ export default function ReportsPage({ navigate }) {
         <div className="dashboard-bottom">
           <div className="charts-col">
             <div className="chart-card">
-              <div className="chart-header">
-                <p className="chart-label">Monthly Clicks Performance</p>
+              <div className="chart-header" style={{ marginBottom: "6px" }}>
+                <p className="chart-label" style={{ textTransform: "uppercase", letterSpacing: "0.08em", fontSize: "0.7rem", color: "#aaa", fontWeight: 700 }}>
+                  Monthly Clicks Performance
+                </p>
+                <span style={{ fontSize: "0.72rem", color: "#C0152E", fontWeight: 600 }}>{chartYear}</span>
               </div>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: "20px", height: "140px", padding: "10px 0" }}>
-                {monthlyData.map((d, i) => (
-                  <div key={i} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: "6px" }}>
-                    <span style={{ fontSize: "0.72rem", fontWeight: 700, color: "#C0152E" }}>{d.clicks}</span>
-                    <div style={{
-                      width: "100%",
-                      maxWidth: "50px",
-                      height: `${(d.clicks / maxClicks) * 100}px`,
-                      background: i === monthlyData.length - 1 ? "#C0152E" : "#e0e0e0",
-                      borderRadius: "8px 8px 0 0",
-                      transition: "height 0.5s ease"
-                    }} />
-                    <span style={{ fontSize: "0.72rem", color: "#999", fontWeight: 600 }}>{d.month}</span>
-                  </div>
-                ))}
-              </div>
+
+              {/* Modern SVG Bar Chart */}
+              {(() => {
+                const BAR_W = 28;
+                const GAP = 14;
+                const CHART_H = 100;
+                const PAD_X = 8;
+                const LABEL_H = 24;
+                const totalW = clickLabels.length * (BAR_W + GAP) - GAP + PAD_X * 2;
+                const svgH = CHART_H + LABEL_H + 12;
+                const peakIdx = clickValues.indexOf(Math.max(...clickValues));
+
+                return (
+                  <svg width="100%" viewBox={`0 0 ${totalW} ${svgH}`} preserveAspectRatio="xMidYMid meet" style={{ display: "block", marginTop: "8px" }}>
+                    <defs>
+                      <linearGradient id="clickPeakGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#C0152E" stopOpacity="1" />
+                        <stop offset="100%" stopColor="#C0152E" stopOpacity="0.55" />
+                      </linearGradient>
+                      <linearGradient id="clickNormGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#C8C8C8" stopOpacity="1" />
+                        <stop offset="100%" stopColor="#DEDEDE" stopOpacity="0.55" />
+                      </linearGradient>
+                      <filter id="clickGlow">
+                        <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#C0152E" floodOpacity="0.28" />
+                      </filter>
+                    </defs>
+                    {clickLabels.map((label, i) => {
+                      const rawH = (clickValues[i] / maxClicks) * CHART_H;
+                      const barH = Math.max(rawH, 6);
+                      const x = PAD_X + i * (BAR_W + GAP);
+                      const y = CHART_H - barH;
+                      const isPeak = i === peakIdx;
+                      const isLatest = i === clickLabels.length - 1;
+                      return (
+                        <g key={i}>
+                          {/* Track */}
+                          <rect x={x} y={0} width={BAR_W} height={CHART_H} rx={9} fill={isPeak ? "#fce8ec" : "#F0F0F0"} />
+                          {/* Bar */}
+                          <rect x={x} y={y} width={BAR_W} height={barH} rx={9}
+                            fill={isPeak ? "url(#clickPeakGrad)" : "url(#clickNormGrad)"}
+                            filter={isPeak ? "url(#clickGlow)" : undefined}
+                          />
+                          {/* Value */}
+                          <text x={x + BAR_W / 2} y={y - 5} textAnchor="middle"
+                            fontSize="7.5" fontWeight={isPeak ? "700" : "500"}
+                            fill={isPeak ? "#C0152E" : "#AAAAAA"}
+                            fontFamily="Inter, sans-serif">
+                            {clickValues[i]}
+                          </text>
+                          {/* Current month dot */}
+                          {isLatest && (
+                            <circle cx={x + BAR_W / 2} cy={CHART_H + 10} r={2.8} fill="#C0152E" />
+                          )}
+                          {/* Month label */}
+                          <text x={x + BAR_W / 2} y={CHART_H + 10 + 12}
+                            textAnchor="middle" fontSize="7.5"
+                            fontWeight={isLatest ? "700" : "400"}
+                            fill={isLatest ? "#C0152E" : "#BDBDBD"}
+                            fontFamily="Inter, sans-serif">
+                            {label}
+                          </text>
+                        </g>
+                      );
+                    })}
+                  </svg>
+                );
+              })()}
             </div>
 
             <div className="chart-card">
@@ -294,7 +349,7 @@ export default function ReportsPage({ navigate }) {
               </div>
               <div style={{ marginTop: "12px" }}>
                 {campaigns.length === 0 ? (
-                  <p style={{ color: "#999", fontSize: "0.85rem" }}>Belum ada campaign aktif.</p>
+                  <p style={{ color: "#999", fontSize: "0.85rem" }}>No active campaigns yet.</p>
                 ) : (
                   <table className="admin-table-mini glass-panel" style={{ width: "100%", overflow: "hidden", borderSpacing: 0 }}>
                     <thead>
