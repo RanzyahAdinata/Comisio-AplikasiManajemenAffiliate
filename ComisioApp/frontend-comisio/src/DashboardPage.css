@@ -408,10 +408,9 @@
 
 /* Grey rounded boxes */
 .grey-rounded-box {
-  background: #f8f9fa;
+  background: #EFEEE9;
   border-radius: 20px;
   padding: 30px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
 }
 
 .charts-grey-box {
