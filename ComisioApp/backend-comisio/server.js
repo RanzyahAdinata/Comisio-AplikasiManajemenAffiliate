@@ -729,9 +729,9 @@ app.get('/api/dashboard/admin', async (req, res) => {
 app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
     const { affiliateId } = req.params;
     try {
-        const sixDaysAgo = new Date();
-        sixDaysAgo.setDate(sixDaysAgo.getDate() - 5);
-        sixDaysAgo.setHours(0,0,0,0);
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+        sevenDaysAgo.setHours(0,0,0,0);
 
         const today = new Date();
         const currentYear = today.getFullYear();
@@ -749,8 +749,8 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
             pool.query('SELECT COUNT(*) FROM referral_clicks WHERE affiliate_id=$1', [affiliateId]),
             pool.query("SELECT COUNT(*) FROM transactions WHERE affiliate_id=$1 AND status='completed'", [affiliateId]),
             pool.query('SELECT COUNT(*) FROM affiliate_campaigns WHERE affiliate_id=$1', [affiliateId]),
-            pool.query("SELECT TO_CHAR(clicked_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY date_str", [affiliateId, sixDaysAgo]),
-            pool.query("SELECT TO_CHAR(created_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY date_str", [affiliateId, sixDaysAgo]),
+            pool.query("SELECT TO_CHAR(clicked_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY date_str", [affiliateId, sevenDaysAgo]),
+            pool.query("SELECT TO_CHAR(created_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY date_str", [affiliateId, sevenDaysAgo]),
             pool.query("SELECT EXTRACT(MONTH FROM created_at)::int as month, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY month ORDER BY month", [affiliateId, yearStart]),
             pool.query("SELECT EXTRACT(MONTH FROM clicked_at)::int as month, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY month ORDER BY month", [affiliateId, yearStart])
         ]);
@@ -764,7 +764,7 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
         const valuesArray = [];
         let tempScore = rawTodayScore;
         
-        for (let i = 0; i <= 5; i++) {
+        for (let i = 0; i <= 6; i++) {
             const d = new Date(today);
             d.setDate(d.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
@@ -784,7 +784,7 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
             valuesArray[j] = Math.floor(valuesArray[j]);
         }
         
-        const currentReputation = valuesArray[5];
+        const currentReputation = valuesArray[6];
         let trend = currentReputation - valuesArray[0];
         trend = parseFloat(trend.toFixed(1));
 
