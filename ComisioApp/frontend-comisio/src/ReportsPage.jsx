@@ -276,13 +276,13 @@ export default function ReportsPage({ navigate }) {
 
               {/* Pill-style SVG Bar Chart — matching Reputation Score design */}
               {(() => {
-                const BAR_W   = 44;
-                const GAP     = 18;
-                const TRACK_H = 160;
-                const PAD_X   = 10;
-                const GLOW_H  = 24;
-                const DOT_GAP = 14;
-                const LABEL_H = 22;
+                const BAR_W   = 28;
+                const GAP     = 12;
+                const TRACK_H = 90;
+                const PAD_X   = 8;
+                const GLOW_H  = 16;
+                const DOT_GAP = 10;
+                const LABEL_H = 18;
                 const totalW  = clickLabels.length * (BAR_W + GAP) - GAP + PAD_X * 2;
                 const svgH    = GLOW_H + TRACK_H + DOT_GAP + LABEL_H + 4;
                 const peakIdx   = clickValues.indexOf(Math.max(...clickValues));
@@ -342,8 +342,8 @@ export default function ReportsPage({ navigate }) {
                             fill="url(#ellShadow)" />
 
                           {/* Value — above fill, inside track area */}
-                          <text x={cx} y={fillY - 8} textAnchor="middle"
-                            fontSize="12" fontWeight={isPeak ? "700" : "500"}
+                          <text x={cx} y={fillY - 6} textAnchor="middle"
+                            fontSize="8" fontWeight={isPeak ? "700" : "500"}
                             fill={isPeak ? "#C0152E" : "#BBBBBB"}
                             fontFamily="Inter, sans-serif">
                             {clickValues[i]}
@@ -351,12 +351,12 @@ export default function ReportsPage({ navigate }) {
 
                           {/* Dot — only for current (latest) month */}
                           {isLatest && (
-                            <circle cx={cx} cy={trackY + TRACK_H + DOT_GAP - 5} r={4.5} fill="#C0152E" />
+                            <circle cx={cx} cy={trackY + TRACK_H + DOT_GAP - 4} r={3} fill="#C0152E" />
                           )}
 
                           {/* Month label */}
-                          <text x={cx} y={trackY + TRACK_H + DOT_GAP + LABEL_H - 2}
-                            textAnchor="middle" fontSize="12"
+                          <text x={cx} y={trackY + TRACK_H + DOT_GAP + LABEL_H - 3}
+                            textAnchor="middle" fontSize="8"
                             fontWeight={isLatest ? "700" : "400"}
                             fill={isLatest ? "#C0152E" : "#C0C0C0"}
                             fontFamily="Inter, sans-serif">
