@@ -38,7 +38,7 @@ export default function AdminLoginPage({ navigate }) {
       const data = await response.json();
       
       if (data.success) {
-        if (data.user.role === 'admin') {
+        if (data.user.role && data.user.role.toLowerCase() === 'admin') {
           // Simpan data user ke localStorage agar Dashboard bisa membacanya
           localStorage.setItem("user", JSON.stringify(data.user));
           navigate("admin-dashboard");

@@ -39,7 +39,7 @@ export default function LoginPage({ navigate }) {
       const data = await response.json();
       
       if (data.success) {
-        if (data.user.role === 'admin') {
+        if (data.user.role && data.user.role.toLowerCase() === 'admin') {
           setError("Akun ini adalah Admin. Silakan login melalui Portal Admin.");
           return;
         }
