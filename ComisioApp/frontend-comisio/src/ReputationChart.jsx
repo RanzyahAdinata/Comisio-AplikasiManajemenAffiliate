@@ -6,9 +6,10 @@ export default function ReputationChart({
   const BAR_W = 22;
   const GAP = 10;
   const CHART_H = 60;
-  const TOP_PAD = 12; // prevent text clipping at y=0
+  const TOP_PAD = 16; // space above bars for text labels
+  const INNER_PAD = 3; // padding inside track so red bar doesn't touch edges
   const PAD_X = 2;
-  const DOT_Y_OFFSET = 12; // extra space between dot and label
+  const DOT_Y_OFFSET = 12;
   const LABEL_H = 24;
   const totalW = days.length * (BAR_W + GAP) - GAP + PAD_X * 2;
   const svgH = TOP_PAD + CHART_H + DOT_Y_OFFSET + LABEL_H;
@@ -45,6 +46,9 @@ export default function ReputationChart({
           const y = TOP_PAD + CHART_H - barH;
           const isPeak = i === peakIdx;
 
+          const innerBarH = Math.max(barH - INNER_PAD * 2, 4);
+          const innerY = Math.min(y + INNER_PAD, TOP_PAD + CHART_H - innerBarH - INNER_PAD);
+
           return (
             <g key={i}>
               {/* Track background */}
@@ -55,18 +59,18 @@ export default function ReputationChart({
                 fill={isPeak ? "#fce8ec" : "#EFEFEF"}
               />
 
-              {/* Bar */}
+              {/* Bar — inset with INNER_PAD so it doesn't touch track edges */}
               <rect
-                x={x} y={y}
-                width={BAR_W} height={barH}
-                rx={10} ry={10}
+                x={x + INNER_PAD} y={innerY}
+                width={BAR_W - INNER_PAD * 2} height={innerBarH}
+                rx={8} ry={8}
                 fill={isPeak ? "url(#peakGrad)" : "url(#normalGrad)"}
                 filter={isPeak ? "url(#peakGlow)" : undefined}
               />
 
-              {/* Value on top */}
+              {/* Value on top — extra gap above the bar */}
               <text
-                x={x + BAR_W / 2} y={y - 4}
+                x={x + BAR_W / 2} y={y - 8}
                 textAnchor="middle"
                 fontSize="6.5"
                 fontWeight={isPeak ? "700" : "500"}
