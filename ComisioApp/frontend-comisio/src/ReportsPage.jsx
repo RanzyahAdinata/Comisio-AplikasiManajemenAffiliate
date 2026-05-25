@@ -266,88 +266,55 @@ export default function ReportsPage({ navigate }) {
         {/* Monthly Performance Chart */}
         <div className="dashboard-bottom">
           <div className="charts-col">
-            <div className="chart-card">
-              <div className="chart-header" style={{ marginBottom: "6px" }}>
-                <p className="chart-label" style={{ textTransform: "uppercase", letterSpacing: "0.08em", fontSize: "0.7rem", color: "#aaa", fontWeight: 700 }}>
-                  Monthly Clicks Performance
+            <div className="chart-card" style={{ padding: "14px 16px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
+                <p style={{ textTransform: "uppercase", letterSpacing: "0.08em", fontSize: "0.62rem", color: "#aaa", fontWeight: 700, margin: 0 }}>
+                  Monthly Clicks
                 </p>
-                <span style={{ fontSize: "0.72rem", color: "#C0152E", fontWeight: 600 }}>{chartYear}</span>
+                <span style={{ fontSize: "0.62rem", color: "#C0152E", fontWeight: 600 }}>{chartYear}</span>
               </div>
 
-              {/* SVG Bar Chart like Reputation Chart */}
-              {(() => {
-                const BAR_W = 26;
-                const GAP = 14;
-                const CHART_H = 88;
-                const PAD_X = 4;
-                const DOT_Y_OFFSET = 14;
-                const LABEL_H = 28;
-                const totalW = clickLabels.length * (BAR_W + GAP) - GAP + PAD_X * 2;
-                const svgH = CHART_H + DOT_Y_OFFSET + LABEL_H;
-                const peakIdx = clickValues.indexOf(Math.max(...clickValues));
+              {/* Compact pill chart */}
+              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "6px", height: "56px" }}>
+                {clickLabels.map((label, i) => {
+                  const isPeak = i === clickValues.indexOf(Math.max(...clickValues));
+                  const isLatest = i === clickLabels.length - 1;
+                  const pct = maxClicks > 0 ? (clickValues[i] / maxClicks) * 100 : 10;
+                  const h = Math.max(pct, 12);
+                  return (
+                    <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "2px", flex: 1 }}>
+                      <span style={{ fontSize: "0.55rem", fontWeight: isPeak ? 700 : 500, color: isPeak ? "#C0152E" : "#bbb" }}>{clickValues[i]}</span>
+                      <div style={{
+                        width: "14px", height: `${h}%`, minHeight: "6px",
+                        borderRadius: "6px",
+                        background: isPeak
+                          ? "linear-gradient(180deg, #C0152E, rgba(192,21,46,0.55))"
+                          : "linear-gradient(180deg, #ccc, #e4e4e4)",
+                        transition: "height 0.4s ease"
+                      }} />
+                    </div>
+                  );
+                })}
+              </div>
 
-                return (
-                  <svg width="100%" viewBox={`0 0 ${totalW} ${svgH}`} preserveAspectRatio="xMidYMid meet" style={{ display: "block", marginTop: "10px" }}>
-                    <defs>
-                      <linearGradient id="clickPeakGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#C0152E" stopOpacity="1" />
-                        <stop offset="100%" stopColor="#C0152E" stopOpacity="0.55" />
-                      </linearGradient>
-                      <linearGradient id="clickNormGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#C8C8C8" stopOpacity="1" />
-                        <stop offset="100%" stopColor="#DEDEDE" stopOpacity="0.6" />
-                      </linearGradient>
-                      <filter id="clickPeakGlow" x="-30%" y="-30%" width="160%" height="160%">
-                        <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#C0152E" floodOpacity="0.3" />
-                      </filter>
-                    </defs>
+              {/* Month labels + dot */}
+              <div style={{ display: "flex", justifyContent: "center", gap: "6px", marginTop: "4px" }}>
+                {clickLabels.map((label, i) => {
+                  const isLatest = i === clickLabels.length - 1;
+                  return (
+                    <div key={i} style={{ flex: 1, textAlign: "center" }}>
+                      {isLatest && <div style={{ width: "4px", height: "4px", borderRadius: "50%", background: "#C0152E", margin: "0 auto 2px" }} />}
+                      <span style={{ fontSize: "0.5rem", fontWeight: isLatest ? 700 : 400, color: isLatest ? "#C0152E" : "#bbb" }}>{label}</span>
+                    </div>
+                  );
+                })}
+              </div>
 
-                    {clickLabels.map((label, i) => {
-                      const rawH = (clickValues[i] / maxClicks) * CHART_H;
-                      const barH = Math.max(rawH, 8);
-                      const x = PAD_X + i * (BAR_W + GAP);
-                      const y = CHART_H - barH;
-                      const isPeak = i === peakIdx;
-                      const isLatest = i === clickLabels.length - 1;
-
-                      return (
-                        <g key={i}>
-                          {/* Track background */}
-                          <rect x={x} y={0} width={BAR_W} height={CHART_H} rx={10} ry={10} fill={isPeak ? "#fce8ec" : "#EFEFEF"} />
-                          
-                          {/* Bar */}
-                          <rect x={x} y={y} width={BAR_W} height={barH} rx={10} ry={10}
-                            fill={isPeak ? "url(#clickPeakGrad)" : "url(#clickNormGrad)"}
-                            filter={isPeak ? "url(#clickPeakGlow)" : undefined}
-                          />
-
-                          {/* Value on top of bar */}
-                          <text x={x + BAR_W / 2} y={y - 5} textAnchor="middle"
-                            fontSize="7.5" fontWeight={isPeak ? "700" : "500"}
-                            fill={isPeak ? "#C0152E" : "#A0A0A0"}
-                            fontFamily="Inter, sans-serif">
-                            {clickValues[i]}
-                          </text>
-
-                          {/* Dot indicator for latest month */}
-                          {isLatest && (
-                            <circle cx={x + BAR_W / 2} cy={CHART_H + DOT_Y_OFFSET - 6} r={3} fill="#C0152E" />
-                          )}
-
-                          {/* Month label */}
-                          <text x={x + BAR_W / 2} y={CHART_H + DOT_Y_OFFSET + LABEL_H - 8}
-                            textAnchor="middle" fontSize="7.5"
-                            fontWeight={isLatest ? "700" : "400"}
-                            fill={isLatest ? "#C0152E" : "#BDBDBD"}
-                            fontFamily="Inter, sans-serif">
-                            {label}
-                          </text>
-                        </g>
-                      );
-                    })}
-                  </svg>
-                );
-              })()}
+              {/* Total clicks summary */}
+              <div style={{ marginTop: "8px", paddingTop: "8px", borderTop: "1px solid #f0f0f0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "0.58rem", color: "#aaa" }}>Total Clicks</span>
+                <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#333" }}>{clickValues.reduce((a, b) => a + b, 0)}</span>
+              </div>
             </div>
 
             <div className="chart-card">
