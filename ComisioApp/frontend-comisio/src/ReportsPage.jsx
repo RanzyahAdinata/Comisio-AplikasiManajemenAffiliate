@@ -267,98 +267,71 @@ export default function ReportsPage({ navigate }) {
         <div className="dashboard-bottom">
           <div className="charts-col">
             <div className="chart-card">
-              <div className="chart-header" style={{ marginBottom: "4px" }}>
+              <div className="chart-header" style={{ marginBottom: "6px" }}>
                 <p className="chart-label" style={{ textTransform: "uppercase", letterSpacing: "0.08em", fontSize: "0.7rem", color: "#aaa", fontWeight: 700 }}>
                   Monthly Clicks Performance
                 </p>
-                <span style={{ fontSize: "0.72rem", color: "#C0152E", fontWeight: 700 }}>{chartYear}</span>
+                <span style={{ fontSize: "0.72rem", color: "#C0152E", fontWeight: 600 }}>{chartYear}</span>
               </div>
 
-              {/* Pill-style SVG Bar Chart — matching Reputation Score design */}
+              {/* Modern SVG Bar Chart */}
               {(() => {
-                const BAR_W   = 44;
-                const GAP     = 18;
-                const TRACK_H = 160;
-                const PAD_X   = 10;
-                const GLOW_H  = 24;
-                const DOT_GAP = 14;
-                const LABEL_H = 22;
-                const totalW  = clickLabels.length * (BAR_W + GAP) - GAP + PAD_X * 2;
-                const svgH    = GLOW_H + TRACK_H + DOT_GAP + LABEL_H + 4;
-                const peakIdx   = clickValues.indexOf(Math.max(...clickValues));
-                const latestIdx = clickLabels.length - 1;
+                const BAR_W = 28;
+                const GAP = 14;
+                const CHART_H = 100;
+                const PAD_X = 8;
+                const LABEL_H = 24;
+                const totalW = clickLabels.length * (BAR_W + GAP) - GAP + PAD_X * 2;
+                const svgH = CHART_H + LABEL_H + 12;
+                const peakIdx = clickValues.indexOf(Math.max(...clickValues));
 
                 return (
-                  <svg width="100%" viewBox={`0 0 ${totalW} ${svgH}`} preserveAspectRatio="xMidYMid meet" style={{ display: "block", marginTop: "10px" }}>
+                  <svg width="100%" viewBox={`0 0 ${totalW} ${svgH}`} preserveAspectRatio="xMidYMid meet" style={{ display: "block", marginTop: "8px" }}>
                     <defs>
-                      <linearGradient id="rPeakFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#C0152E" stopOpacity="0.92" />
-                        <stop offset="100%" stopColor="#C0152E" stopOpacity="0.5" />
+                      <linearGradient id="clickPeakGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#C0152E" stopOpacity="1" />
+                        <stop offset="100%" stopColor="#C0152E" stopOpacity="0.55" />
                       </linearGradient>
-                      <linearGradient id="rNormFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#C8C8C8" stopOpacity="0.9" />
-                        <stop offset="100%" stopColor="#E2E2E2" stopOpacity="0.5" />
+                      <linearGradient id="clickNormGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#C8C8C8" stopOpacity="1" />
+                        <stop offset="100%" stopColor="#DEDEDE" stopOpacity="0.55" />
                       </linearGradient>
-                      <radialGradient id="ellShadow" cx="50%" cy="30%" r="50%">
-                        <stop offset="0%" stopColor="#00000018" />
-                        <stop offset="100%" stopColor="transparent" />
-                      </radialGradient>
-                      <filter id="rGlow">
-                        <feDropShadow dx="0" dy="5" stdDeviation="6" floodColor="#C0152E" floodOpacity="0.25" />
+                      <filter id="clickGlow">
+                        <feDropShadow dx="0" dy="3" stdDeviation="3" floodColor="#C0152E" floodOpacity="0.28" />
                       </filter>
                     </defs>
-
                     {clickLabels.map((label, i) => {
-                      const cx     = PAD_X + i * (BAR_W + GAP) + BAR_W / 2;
-                      const barX   = PAD_X + i * (BAR_W + GAP);
-                      const trackY = GLOW_H;
-                      const ratio  = clickValues[i] / maxClicks;
-                      const fillH  = Math.max(ratio * TRACK_H, 12);
-                      const fillY  = trackY + TRACK_H - fillH;
-                      const isPeak   = i === peakIdx;
-                      const isLatest = i === latestIdx;
-                      const R = BAR_W / 2;
-
+                      const rawH = (clickValues[i] / maxClicks) * CHART_H;
+                      const barH = Math.max(rawH, 6);
+                      const x = PAD_X + i * (BAR_W + GAP);
+                      const y = CHART_H - barH;
+                      const isPeak = i === peakIdx;
+                      const isLatest = i === clickLabels.length - 1;
                       return (
                         <g key={i}>
-                          {/* Soft pink glow column above + behind track for peak */}
-                          {isPeak && (
-                            <rect x={barX - 4} y={0} width={BAR_W + 8} height={GLOW_H + TRACK_H}
-                              rx={R + 4} fill="rgba(192,21,46,0.07)" />
-                          )}
-
-                          {/* Full-height track pill */}
-                          <rect x={barX} y={trackY} width={BAR_W} height={TRACK_H}
-                            rx={R} fill={isPeak ? "rgba(192,21,46,0.1)" : "#EAEAEA"} />
-
-                          {/* Filled bar at bottom of track */}
-                          <rect x={barX} y={fillY} width={BAR_W} height={fillH}
-                            rx={R}
-                            fill={isPeak ? "url(#rPeakFill)" : "url(#rNormFill)"}
-                            filter={isPeak ? "url(#rGlow)" : undefined} />
-
-                          {/* Ellipse shadow at base of track */}
-                          <ellipse cx={cx} cy={trackY + TRACK_H - 5} rx={R - 3} ry={7}
-                            fill="url(#ellShadow)" />
-
-                          {/* Value — above fill, inside track area */}
-                          <text x={cx} y={fillY - 8} textAnchor="middle"
-                            fontSize="12" fontWeight={isPeak ? "700" : "500"}
-                            fill={isPeak ? "#C0152E" : "#BBBBBB"}
+                          {/* Track */}
+                          <rect x={x} y={0} width={BAR_W} height={CHART_H} rx={9} fill={isPeak ? "#fce8ec" : "#F0F0F0"} />
+                          {/* Bar */}
+                          <rect x={x} y={y} width={BAR_W} height={barH} rx={9}
+                            fill={isPeak ? "url(#clickPeakGrad)" : "url(#clickNormGrad)"}
+                            filter={isPeak ? "url(#clickGlow)" : undefined}
+                          />
+                          {/* Value */}
+                          <text x={x + BAR_W / 2} y={y - 5} textAnchor="middle"
+                            fontSize="7.5" fontWeight={isPeak ? "700" : "500"}
+                            fill={isPeak ? "#C0152E" : "#AAAAAA"}
                             fontFamily="Inter, sans-serif">
                             {clickValues[i]}
                           </text>
-
-                          {/* Dot — only for current (latest) month */}
+                          {/* Current month dot */}
                           {isLatest && (
-                            <circle cx={cx} cy={trackY + TRACK_H + DOT_GAP - 5} r={4.5} fill="#C0152E" />
+                            <circle cx={x + BAR_W / 2} cy={CHART_H + 10} r={2.8} fill="#C0152E" />
                           )}
-
                           {/* Month label */}
-                          <text x={cx} y={trackY + TRACK_H + DOT_GAP + LABEL_H - 2}
-                            textAnchor="middle" fontSize="12"
+                          <text x={x + BAR_W / 2} y={CHART_H + 10 + 12}
+                            textAnchor="middle" fontSize="7.5"
                             fontWeight={isLatest ? "700" : "400"}
-                            fill={isLatest ? "#C0152E" : "#C0C0C0"}
+                            fill={isLatest ? "#C0152E" : "#BDBDBD"}
                             fontFamily="Inter, sans-serif">
                             {label}
                           </text>
