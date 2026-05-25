@@ -1,6 +1,7 @@
-export default function ReputationChart() {
-  const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-  const values = [86.14, 88.26, 83.26, 91.54, 88.0, 84.0];
+export default function ReputationChart({ 
+  days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"], 
+  values = [86.14, 88.26, 83.26, 91.54, 88.0, 84.0] 
+}) {
   const maxVal = 100;
 
   const barWidth = 28;

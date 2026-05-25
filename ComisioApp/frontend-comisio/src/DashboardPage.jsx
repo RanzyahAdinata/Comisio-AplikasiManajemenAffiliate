@@ -142,18 +142,25 @@ export default function DashboardPage({ navigate }) {
               <div className="chart-row">
                 <div className="chart-text-col">
                   <p className="chart-title">Your Reputation Score</p>
-                  <h3 className="chart-big-number">91.54</h3>
+                  <h3 className="chart-big-number">{stats?.reputationData?.current ?? 91.54}</h3>
                   <div className="chart-badge-row">
-                    <span className="trend-badge green-badge">
-                      <svg style={{marginRight:3}} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="18 15 12 9 6 15" /></svg>
-                      8.3
+                    <span className={`trend-badge ${(stats?.reputationData?.trend ?? 8.3) < 0 ? 'red-badge' : 'green-badge'}`}>
+                      {(stats?.reputationData?.trend ?? 8.3) < 0 ? (
+                        <svg style={{marginRight:3}} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="6 9 12 15 18 9" /></svg>
+                      ) : (
+                        <svg style={{marginRight:3}} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="18 15 12 9 6 15" /></svg>
+                      )}
+                      {Math.abs(stats?.reputationData?.trend ?? 8.3)}
                     </span>
                     <span className="trend-text">Since 7 last days</span>
                   </div>
                   <p className="chart-desc">You're in the top of 5% of all sales affiliator</p>
                 </div>
                 <div className="chart-graphics-col" style={{ marginTop: '10px' }}>
-                  <ReputationChart />
+                  <ReputationChart 
+                    days={stats?.reputationData?.days} 
+                    values={stats?.reputationData?.values} 
+                  />
                 </div>
               </div>
             </div>

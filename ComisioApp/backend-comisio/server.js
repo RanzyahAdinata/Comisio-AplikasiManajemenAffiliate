@@ -736,6 +736,44 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
         const totalSales = await pool.query("SELECT COUNT(*) FROM transactions WHERE affiliate_id=$1 AND status='completed'", [affiliateId]);
         const campaigns = await pool.query('SELECT COUNT(*) FROM affiliate_campaigns WHERE affiliate_id=$1', [affiliateId]);
 
+        // Kalkulasi Reputation Score Real-time untuk 6 hari terakhir
+        const sixDaysAgo = new Date();
+        sixDaysAgo.setDate(sixDaysAgo.getDate() - 5);
+        sixDaysAgo.setHours(0,0,0,0);
+
+        const recentClicks = await pool.query(
+            "SELECT TO_CHAR(clicked_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY date_str", 
+            [affiliateId, sixDaysAgo]
+        );
+        const recentSales = await pool.query(
+            "SELECT TO_CHAR(created_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY date_str", 
+            [affiliateId, sixDaysAgo]
+        );
+
+        const daysArray = [];
+        const valuesArray = [];
+        const today = new Date();
+        for (let i = 5; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - i);
+            const dateStr = d.toISOString().split('T')[0];
+            const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+            
+            const clicksOnDay = parseInt(recentClicks.rows.find(r => r.date_str === dateStr)?.count || 0);
+            const salesOnDay = parseInt(recentSales.rows.find(r => r.date_str === dateStr)?.count || 0);
+            
+            // Rumus Score: Base 50 + (2 poin per click) + (10 poin per sale), max 100
+            let dailyScore = 50 + (clicksOnDay * 2) + (salesOnDay * 10);
+            if (dailyScore > 100) dailyScore = 100;
+            
+            daysArray.push(dayName);
+            valuesArray.push(dailyScore);
+        }
+        
+        const currentReputation = valuesArray[5];
+        let trend = currentReputation - valuesArray[0];
+        trend = parseFloat(trend.toFixed(1));
+
         res.json({
             success: true,
             stats: {
@@ -744,7 +782,13 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
                 pendingOrdersCount: parseInt(pendingCommCount.rows[0].count),
                 totalClicks: parseInt(totalClicks.rows[0].count),
                 totalSales: parseInt(totalSales.rows[0].count),
-                activeCampaigns: parseInt(campaigns.rows[0].count)
+                activeCampaigns: parseInt(campaigns.rows[0].count),
+                reputationData: {
+                    days: daysArray,
+                    values: valuesArray,
+                    current: currentReputation,
+                    trend: trend
+                }
             }
         });
     } catch (err) {
