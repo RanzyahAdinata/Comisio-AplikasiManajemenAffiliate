@@ -70,6 +70,15 @@ export default function DashboardPage({ navigate }) {
 
   const formatIDR = (val) => "IDR " + Number(val || 0).toLocaleString("id-ID");
 
+  // Calculate sales trend dynamically
+  let salesTrend = 0;
+  if (stats?.salesChart?.values?.length >= 2) {
+    const vals = stats.salesChart.values;
+    salesTrend = vals[vals.length - 1] - vals[vals.length - 2];
+  } else if (stats?.salesChart?.values?.length === 1) {
+    salesTrend = stats.salesChart.values[0];
+  }
+
   return (
     <div className={`dashboard-layout ${collapsed ? "sidebar-collapsed" : ""}`}>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} navigate={navigate} active="dashboard" user={user} />
@@ -110,7 +119,7 @@ export default function DashboardPage({ navigate }) {
           <div className="stat-divider"></div>
           <div className="stat-block">
             <p className="stat-label">Total Clicks</p>
-            <h2 className="stat-value">{stats?.totalClicks ?? 687}</h2>
+            <h2 className="stat-value">{stats?.totalClicks ?? 0}</h2>
             <p className="stat-note">product /month</p>
           </div>
         </div>
@@ -122,11 +131,15 @@ export default function DashboardPage({ navigate }) {
               <div className="chart-row">
                 <div className="chart-text-col">
                   <p className="chart-title">Total Product Sold (Monthly)</p>
-                  <h3 className="chart-big-number">{stats?.totalSales ?? 38}</h3>
+                  <h3 className="chart-big-number">{stats?.totalSales ?? 0}</h3>
                   <div className="chart-badge-row">
-                    <span className="trend-badge red-badge">
-                      <svg style={{marginRight:3}} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="6 9 12 15 18 9" /></svg>
-                      9
+                    <span className={`trend-badge ${salesTrend < 0 ? 'red-badge' : 'green-badge'}`}>
+                      {salesTrend < 0 ? (
+                        <svg style={{marginRight:3}} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="6 9 12 15 18 9" /></svg>
+                      ) : (
+                        <svg style={{marginRight:3}} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="18 15 12 9 6 15" /></svg>
+                      )}
+                      {Math.abs(salesTrend)}
                     </span>
                     <span className="trend-text">Since last month</span>
                   </div>
@@ -146,19 +159,19 @@ export default function DashboardPage({ navigate }) {
               <div className="chart-row">
                 <div className="chart-text-col">
                   <p className="chart-title">Your Reputation Score</p>
-                  <h3 className="chart-big-number">{stats?.reputationData?.current ?? 91.54}</h3>
+                  <h3 className="chart-big-number">{stats?.reputationData?.current ?? 50}</h3>
                   <div className="chart-badge-row">
-                    <span className={`trend-badge ${(stats?.reputationData?.trend ?? 8.3) < 0 ? 'red-badge' : 'green-badge'}`}>
-                      {(stats?.reputationData?.trend ?? 8.3) < 0 ? (
+                    <span className={`trend-badge ${(stats?.reputationData?.trend ?? 0) < 0 ? 'red-badge' : 'green-badge'}`}>
+                      {(stats?.reputationData?.trend ?? 0) < 0 ? (
                         <svg style={{marginRight:3}} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="6 9 12 15 18 9" /></svg>
                       ) : (
                         <svg style={{marginRight:3}} width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="18 15 12 9 6 15" /></svg>
                       )}
-                      {Math.abs(stats?.reputationData?.trend ?? 8.3)}
+                      {Math.abs(stats?.reputationData?.trend ?? 0)}
                     </span>
                     <span className="trend-text">Since 7 last days</span>
                   </div>
-                  <p className="chart-desc">You're in the top of 5% of all sales affiliator</p>
+                  <p className="chart-desc">Reputation is updated daily based on clicks and sales</p>
                 </div>
                 <div className="chart-graphics-col" style={{ marginTop: '10px' }}>
                   <ReputationChart 
