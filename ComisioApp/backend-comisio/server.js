@@ -755,23 +755,27 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
             pool.query("SELECT EXTRACT(MONTH FROM clicked_at)::int as month, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY month ORDER BY month", [affiliateId, yearStart])
         ]);
 
-        // Kalkulasi Reputation Score Real-time
+        // Kalkulasi Reputation Score Real-time (Akumulatif)
+        let rawTodayScore = 50 + (parseInt(totalClicks.rows[0].count) * 2) + (parseInt(totalSales.rows[0].count) * 10);
+        
         const daysArray = [];
         const valuesArray = [];
-        for (let i = 5; i >= 0; i--) {
+        let tempScore = rawTodayScore;
+        
+        for (let i = 0; i <= 5; i++) {
             const d = new Date(today);
             d.setDate(d.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
-            const dayName = d.toLocaleDateString('en-US', { weekday: 'long' });
+            const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
             
+            daysArray.unshift(dayName);
+            // Cap at 100 for display
+            valuesArray.unshift(Math.min(tempScore, 100));
+            
+            // Subtract this day's activity to get yesterday's score
             const clicksOnDay = parseInt(recentClicks.rows.find(r => r.date_str === dateStr)?.count || 0);
             const salesOnDay = parseInt(recentSales.rows.find(r => r.date_str === dateStr)?.count || 0);
-            
-            let dailyScore = 50 + (clicksOnDay * 2) + (salesOnDay * 10);
-            if (dailyScore > 100) dailyScore = 100;
-            
-            daysArray.push(dayName);
-            valuesArray.push(dailyScore);
+            tempScore -= (clicksOnDay * 2) + (salesOnDay * 10);
         }
         
         const currentReputation = valuesArray[5];
