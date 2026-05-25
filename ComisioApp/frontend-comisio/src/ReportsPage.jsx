@@ -274,59 +274,70 @@ export default function ReportsPage({ navigate }) {
                 <span style={{ fontSize: "0.72rem", color: "#C0152E", fontWeight: 600 }}>{chartYear}</span>
               </div>
 
-              {/* Compact Minimalist SVG Bar Chart */}
+              {/* SVG Bar Chart like Reputation Chart */}
               {(() => {
-                const BAR_W = 16;
-                const GAP = 10;
-                const CHART_H = 60;
-                const PAD_X = 6;
-                const LABEL_H = 16;
+                const BAR_W = 26;
+                const GAP = 14;
+                const CHART_H = 88;
+                const PAD_X = 4;
+                const DOT_Y_OFFSET = 14;
+                const LABEL_H = 28;
                 const totalW = clickLabels.length * (BAR_W + GAP) - GAP + PAD_X * 2;
-                const svgH = CHART_H + LABEL_H + 10;
+                const svgH = CHART_H + DOT_Y_OFFSET + LABEL_H;
                 const peakIdx = clickValues.indexOf(Math.max(...clickValues));
 
                 return (
-                  <svg width="100%" viewBox={`0 0 ${totalW} ${svgH}`} preserveAspectRatio="xMidYMid meet" style={{ display: "block", marginTop: "4px" }}>
+                  <svg width="100%" viewBox={`0 0 ${totalW} ${svgH}`} preserveAspectRatio="xMidYMid meet" style={{ display: "block", marginTop: "10px" }}>
                     <defs>
                       <linearGradient id="clickPeakGrad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="#C0152E" stopOpacity="1" />
-                        <stop offset="100%" stopColor="#C0152E" stopOpacity="0.6" />
+                        <stop offset="100%" stopColor="#C0152E" stopOpacity="0.55" />
                       </linearGradient>
                       <linearGradient id="clickNormGrad" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#D4D4D4" stopOpacity="1" />
-                        <stop offset="100%" stopColor="#E8E8E8" stopOpacity="0.6" />
+                        <stop offset="0%" stopColor="#C8C8C8" stopOpacity="1" />
+                        <stop offset="100%" stopColor="#DEDEDE" stopOpacity="0.6" />
                       </linearGradient>
+                      <filter id="clickPeakGlow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feDropShadow dx="0" dy="4" stdDeviation="4" floodColor="#C0152E" floodOpacity="0.3" />
+                      </filter>
                     </defs>
+
                     {clickLabels.map((label, i) => {
                       const rawH = (clickValues[i] / maxClicks) * CHART_H;
-                      const barH = Math.max(rawH, 4);
+                      const barH = Math.max(rawH, 8);
                       const x = PAD_X + i * (BAR_W + GAP);
                       const y = CHART_H - barH;
                       const isPeak = i === peakIdx;
                       const isLatest = i === clickLabels.length - 1;
+
                       return (
                         <g key={i}>
-                          {/* Track */}
-                          <rect x={x} y={0} width={BAR_W} height={CHART_H} rx={4} fill={isPeak ? "#fdf0f2" : "#F4F4F4"} />
+                          {/* Track background */}
+                          <rect x={x} y={0} width={BAR_W} height={CHART_H} rx={10} ry={10} fill={isPeak ? "#fce8ec" : "#EFEFEF"} />
+                          
                           {/* Bar */}
-                          <rect x={x} y={y} width={BAR_W} height={barH} rx={4}
+                          <rect x={x} y={y} width={BAR_W} height={barH} rx={10} ry={10}
                             fill={isPeak ? "url(#clickPeakGrad)" : "url(#clickNormGrad)"}
+                            filter={isPeak ? "url(#clickPeakGlow)" : undefined}
                           />
-                          {/* Value */}
-                          <text x={x + BAR_W / 2} y={y - 3} textAnchor="middle"
-                            fontSize="5.5" fontWeight={isPeak ? "700" : "600"}
-                            fill={isPeak ? "#C0152E" : "#AAAAAA"}
+
+                          {/* Value on top of bar */}
+                          <text x={x + BAR_W / 2} y={y - 5} textAnchor="middle"
+                            fontSize="7.5" fontWeight={isPeak ? "700" : "500"}
+                            fill={isPeak ? "#C0152E" : "#A0A0A0"}
                             fontFamily="Inter, sans-serif">
                             {clickValues[i]}
                           </text>
-                          {/* Current month dot */}
+
+                          {/* Dot indicator for latest month */}
                           {isLatest && (
-                            <circle cx={x + BAR_W / 2} cy={CHART_H + 6} r={1.5} fill="#C0152E" />
+                            <circle cx={x + BAR_W / 2} cy={CHART_H + DOT_Y_OFFSET - 6} r={3} fill="#C0152E" />
                           )}
+
                           {/* Month label */}
-                          <text x={x + BAR_W / 2} y={CHART_H + 14}
-                            textAnchor="middle" fontSize="5.5"
-                            fontWeight={isLatest ? "700" : "500"}
+                          <text x={x + BAR_W / 2} y={CHART_H + DOT_Y_OFFSET + LABEL_H - 8}
+                            textAnchor="middle" fontSize="7.5"
+                            fontWeight={isLatest ? "700" : "400"}
                             fill={isLatest ? "#C0152E" : "#BDBDBD"}
                             fontFamily="Inter, sans-serif">
                             {label}
