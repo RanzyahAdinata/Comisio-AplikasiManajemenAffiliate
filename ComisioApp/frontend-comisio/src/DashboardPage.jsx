@@ -133,7 +133,11 @@ export default function DashboardPage({ navigate }) {
                   <p className="chart-desc">Increase your sales to earn more commission</p>
                 </div>
                 <div className="chart-graphics-col">
-                  <SalesChart />
+                  <SalesChart 
+                    labels={stats?.salesChart?.labels}
+                    values={stats?.salesChart?.values}
+                    year={stats?.salesChart?.year}
+                  />
                 </div>
               </div>
               

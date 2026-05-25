@@ -1,22 +1,34 @@
-export default function SalesChart() {
-  // Monthly data: Jan–Jun
-  const data = [18, 28, 22, 35, 25, 42, 30, 38, 45, 32, 50, 38];
-  const monthLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+export default function SalesChart({ labels, values, year }) {
+  const now = new Date();
+  const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+  // Gunakan data dari backend jika tersedia, fallback ke data bulan-bulan yang sudah lewat
+  const currentMonth = now.getMonth(); // 0-based
+  const currentYear = now.getFullYear();
+
+  const chartLabels = labels && labels.length > 0
+    ? labels
+    : MONTH_NAMES.slice(0, currentMonth + 1);
+
+  const chartValues = values && values.length > 0
+    ? values
+    : chartLabels.map(() => 0);
+
+  const chartYear = year || currentYear;
 
   const W = 340;
   const H = 115;
   const PAD = { top: 16, right: 14, bottom: 30, left: 14 };
-
   const chartW = W - PAD.left - PAD.right;
   const chartH = H - PAD.top - PAD.bottom;
 
-  const maxVal = Math.max(...data) + 8;
-  const minVal = Math.min(...data) - 4;
+  const maxVal = Math.max(...chartValues, 1) + 2;
+  const minVal = 0;
 
-  const getX = (i) => PAD.left + (i / (data.length - 1)) * chartW;
+  const getX = (i) => PAD.left + (i / Math.max(chartValues.length - 1, 1)) * chartW;
   const getY = (v) => PAD.top + chartH - ((v - minVal) / (maxVal - minVal)) * chartH;
 
-  const points = data.map((v, i) => [getX(i), getY(v)]);
+  const points = chartValues.map((v, i) => [getX(i), getY(v)]);
 
   // Smooth bezier path
   let linePath = `M ${points[0][0]} ${points[0][1]}`;
@@ -30,10 +42,15 @@ export default function SalesChart() {
   const baseline = PAD.top + chartH;
   const areaPath = `${linePath} L ${points[points.length - 1][0]} ${baseline} L ${points[0][0]} ${baseline} Z`;
 
-  const peakIdx = data.indexOf(Math.max(...data));
+  // Peak = last data point (bulan terakhir = bulan sekarang)
+  const peakIdx = points.length - 1;
 
   // Y-axis guide values
-  const yTicks = [Math.round(minVal), Math.round((minVal + maxVal) / 2), Math.round(maxVal)];
+  const yMid = Math.round(maxVal / 2);
+  const yTicks = [0, yMid, Math.round(maxVal)];
+
+  const startLabel = `${chartLabels[0]} ${chartYear}`;
+  const endLabel = `${chartLabels[chartLabels.length - 1]} ${chartYear}`;
 
   return (
     <div style={{ width: "100%", overflow: "hidden" }}>
@@ -52,7 +69,6 @@ export default function SalesChart() {
           <filter id="lineShadow" x="-5%" y="-20%" width="110%" height="140%">
             <feDropShadow dx="0" dy="2" stdDeviation="2.5" floodColor="#E5183B" floodOpacity="0.2" />
           </filter>
-          {/* Clip so area doesn't overflow */}
           <clipPath id="chartClip">
             <rect x={PAD.left} y={PAD.top} width={chartW} height={chartH + 2} />
           </clipPath>
@@ -74,20 +90,24 @@ export default function SalesChart() {
         })}
 
         {/* Area fill */}
-        <path d={areaPath} fill="url(#salesAreaGrad)" clipPath="url(#chartClip)" />
+        {points.length > 1 && (
+          <path d={areaPath} fill="url(#salesAreaGrad)" clipPath="url(#chartClip)" />
+        )}
 
         {/* Line */}
-        <path
-          d={linePath}
-          fill="none"
-          stroke="#E5183B"
-          strokeWidth="2.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          filter="url(#lineShadow)"
-        />
+        {points.length > 1 && (
+          <path
+            d={linePath}
+            fill="none"
+            stroke="#E5183B"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            filter="url(#lineShadow)"
+          />
+        )}
 
-        {/* Vertical dashed at peak */}
+        {/* Vertical dashed at current month (last point) */}
         <line
           x1={points[peakIdx][0]} y1={PAD.top + 4}
           x2={points[peakIdx][0]} y2={baseline}
@@ -97,7 +117,7 @@ export default function SalesChart() {
           opacity="0.4"
         />
 
-        {/* Peak dot — outer ring */}
+        {/* Peak dot — outer ring (halo) */}
         <circle
           cx={points[peakIdx][0]} cy={points[peakIdx][1]}
           r={7} fill="#E5183B" opacity="0.12"
@@ -108,13 +128,13 @@ export default function SalesChart() {
           r={4.5} fill="white" stroke="#E5183B" strokeWidth="2"
         />
 
-        {/* X-axis labels: only Jan and latest */}
+        {/* X-axis: first month and current month */}
         <text
           x={PAD.left} y={H - 6}
           fontSize="8.5" fill="#C0C0C0"
           fontFamily="Inter, sans-serif" fontWeight="500"
         >
-          Jan 2026
+          {startLabel}
         </text>
         <text
           x={W - PAD.right} y={H - 6}
@@ -122,7 +142,7 @@ export default function SalesChart() {
           textAnchor="end"
           fontFamily="Inter, sans-serif" fontWeight="500"
         >
-          Dec 2026
+          {endLabel}
         </text>
       </svg>
     </div>

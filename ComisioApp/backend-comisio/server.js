@@ -774,6 +774,28 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
         let trend = currentReputation - valuesArray[0];
         trend = parseFloat(trend.toFixed(1));
 
+        // Monthly sales dari Jan sampai bulan sekarang
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1; // 1-based
+        const yearStart = new Date(`${currentYear}-01-01`);
+
+        const monthlySalesRaw = await pool.query(
+            `SELECT EXTRACT(MONTH FROM created_at)::int as month, COUNT(*) as count
+             FROM transactions
+             WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2
+             GROUP BY month ORDER BY month`,
+            [affiliateId, yearStart]
+        );
+
+        const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const monthLabels = [];
+        const monthValues = [];
+        for (let m = 1; m <= currentMonth; m++) {
+            monthLabels.push(MONTH_NAMES[m - 1]);
+            const found = monthlySalesRaw.rows.find(r => r.month === m);
+            monthValues.push(found ? parseInt(found.count) : 0);
+        }
+
         res.json({
             success: true,
             stats: {
@@ -788,6 +810,11 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
                     values: valuesArray,
                     current: currentReputation,
                     trend: trend
+                },
+                salesChart: {
+                    labels: monthLabels,
+                    values: monthValues,
+                    year: currentYear
                 }
             }
         });
