@@ -756,7 +756,9 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
         ]);
 
         // Kalkulasi Reputation Score Real-time (Akumulatif)
-        let rawTodayScore = 50 + (parseInt(totalClicks.rows[0].count) * 2) + (parseInt(totalSales.rows[0].count) * 10);
+        let rawTodayScore = 50 + (parseInt(totalClicks.rows[0].count) * 0.5) + (parseInt(totalSales.rows[0].count) * 2);
+        // Membulatkan agar tidak ada angka desimal
+        rawTodayScore = Math.floor(rawTodayScore);
         
         const daysArray = [];
         const valuesArray = [];
@@ -774,7 +776,12 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
             // Subtract this day's activity to get yesterday's score
             const clicksOnDay = parseInt(recentClicks.rows.find(r => r.date_str === dateStr)?.count || 0);
             const salesOnDay = parseInt(recentSales.rows.find(r => r.date_str === dateStr)?.count || 0);
-            tempScore -= (clicksOnDay * 2) + (salesOnDay * 10);
+            tempScore -= (clicksOnDay * 0.5) + (salesOnDay * 2);
+        }
+        
+        // Membulatkan seluruh nilai di dalam array agar rapi
+        for (let j = 0; j < valuesArray.length; j++) {
+            valuesArray[j] = Math.floor(valuesArray[j]);
         }
         
         const currentReputation = valuesArray[5];

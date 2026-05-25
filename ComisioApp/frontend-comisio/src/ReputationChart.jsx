@@ -3,13 +3,13 @@ export default function ReputationChart({
   values = [86, 88, 83, 92, 88, 84] 
 }) {
   const maxVal = Math.max(100, ...values);
-  const BAR_W = 26;
-  const GAP = 14;
-  const CHART_H = 88;
-  const TOP_PAD = 15; // prevent text clipping at y=0
-  const PAD_X = 4;
-  const DOT_Y_OFFSET = 14; // extra space between dot and label
-  const LABEL_H = 28;
+  const BAR_W = 22;
+  const GAP = 10;
+  const CHART_H = 60;
+  const TOP_PAD = 12; // prevent text clipping at y=0
+  const PAD_X = 2;
+  const DOT_Y_OFFSET = 12; // extra space between dot and label
+  const LABEL_H = 24;
   const totalW = days.length * (BAR_W + GAP) - GAP + PAD_X * 2;
   const svgH = TOP_PAD + CHART_H + DOT_Y_OFFSET + LABEL_H;
 
@@ -66,9 +66,9 @@ export default function ReputationChart({
 
               {/* Value on top */}
               <text
-                x={x + BAR_W / 2} y={y - 5}
+                x={x + BAR_W / 2} y={y - 4}
                 textAnchor="middle"
-                fontSize="7.5"
+                fontSize="6.5"
                 fontWeight={isPeak ? "700" : "500"}
                 fill={isPeak ? "#E5183B" : "#A0A0A0"}
                 fontFamily="Inter, sans-serif"
@@ -91,7 +91,7 @@ export default function ReputationChart({
                 x={x + BAR_W / 2}
                 y={TOP_PAD + CHART_H + DOT_Y_OFFSET + LABEL_H - 8}
                 textAnchor="middle"
-                fontSize="7.5"
+                fontSize="6.5"
                 fontWeight={isPeak ? "700" : "400"}
                 fill={isPeak ? "#E5183B" : "#BDBDBD"}
                 fontFamily="Inter, sans-serif"
