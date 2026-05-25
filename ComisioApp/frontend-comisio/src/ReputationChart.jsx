@@ -2,17 +2,18 @@ export default function ReputationChart({
   days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], 
   values = [86, 88, 83, 92, 88, 84] 
 }) {
-  const maxVal = 100;
+  const maxVal = Math.max(100, ...values);
   const BAR_W = 26;
   const GAP = 14;
   const CHART_H = 88;
+  const TOP_PAD = 15; // prevent text clipping at y=0
   const PAD_X = 4;
   const DOT_Y_OFFSET = 14; // extra space between dot and label
   const LABEL_H = 28;
   const totalW = days.length * (BAR_W + GAP) - GAP + PAD_X * 2;
-  const svgH = CHART_H + DOT_Y_OFFSET + LABEL_H;
+  const svgH = TOP_PAD + CHART_H + DOT_Y_OFFSET + LABEL_H;
 
-  const peakIdx = values.indexOf(Math.max(...values));
+  const peakIdx = values.lastIndexOf(Math.max(...values));
   const shortDays = days.map(d => (d || "").substring(0, 3));
 
   return (
@@ -41,14 +42,14 @@ export default function ReputationChart({
           const rawH = (values[i] / maxVal) * CHART_H;
           const barH = Math.max(rawH, 8);
           const x = PAD_X + i * (BAR_W + GAP);
-          const y = CHART_H - barH;
+          const y = TOP_PAD + CHART_H - barH;
           const isPeak = i === peakIdx;
 
           return (
             <g key={i}>
               {/* Track background */}
               <rect
-                x={x} y={0}
+                x={x} y={TOP_PAD}
                 width={BAR_W} height={CHART_H}
                 rx={10} ry={10}
                 fill={isPeak ? "#fce8ec" : "#EFEFEF"}
@@ -79,7 +80,7 @@ export default function ReputationChart({
               {isPeak && (
                 <circle
                   cx={x + BAR_W / 2}
-                  cy={CHART_H + DOT_Y_OFFSET - 6}
+                  cy={TOP_PAD + CHART_H + DOT_Y_OFFSET - 6}
                   r={3}
                   fill="#E5183B"
                 />
@@ -88,7 +89,7 @@ export default function ReputationChart({
               {/* Day label */}
               <text
                 x={x + BAR_W / 2}
-                y={CHART_H + DOT_Y_OFFSET + LABEL_H - 8}
+                y={TOP_PAD + CHART_H + DOT_Y_OFFSET + LABEL_H - 8}
                 textAnchor="middle"
                 fontSize="7.5"
                 fontWeight={isPeak ? "700" : "400"}

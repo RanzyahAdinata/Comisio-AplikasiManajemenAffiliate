@@ -769,8 +769,7 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
             const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
             
             daysArray.unshift(dayName);
-            // Cap at 100 for display
-            valuesArray.unshift(Math.min(tempScore, 100));
+            valuesArray.unshift(tempScore);
             
             // Subtract this day's activity to get yesterday's score
             const clicksOnDay = parseInt(recentClicks.rows.find(r => r.date_str === dateStr)?.count || 0);
