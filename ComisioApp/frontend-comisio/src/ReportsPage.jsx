@@ -275,15 +275,15 @@ export default function ReportsPage({ navigate }) {
               </div>
 
               {/* Compact pill chart */}
-              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "8px", height: "100px" }}>
+              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: "8px", height: "80px" }}>
                 {clickLabels.map((label, i) => {
                   const isPeak = i === clickValues.indexOf(Math.max(...clickValues));
                   const isLatest = i === clickLabels.length - 1;
-                  const pct = maxClicks > 0 ? (clickValues[i] / maxClicks) * 100 : 10;
-                  const h = Math.max(pct, 15);
+                  const pct = maxClicks > 0 ? (clickValues[i] / maxClicks) * 100 : 0;
+                  const h = Math.max(pct, 12); // minimum height for 0 values
                   return (
-                    <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "3px", flex: 1 }}>
-                      <span style={{ fontSize: "0.6rem", fontWeight: isPeak ? 700 : 500, color: isPeak ? "#C0152E" : "#bbb" }}>{clickValues[i]}</span>
+                    <div key={i} style={{ display: "flex", flexDirection: "column", justifyContent: "flex-end", alignItems: "center", gap: "4px", flex: 1, height: "100%" }}>
+                      <span style={{ fontSize: "0.6rem", fontWeight: isPeak ? 700 : 500, color: isPeak ? "#C0152E" : "#bbb", lineHeight: 1 }}>{clickValues[i]}</span>
                       <div style={{
                         width: "20px", height: `${h}%`, minHeight: "10px",
                         borderRadius: "8px",
