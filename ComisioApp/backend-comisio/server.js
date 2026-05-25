@@ -729,30 +729,35 @@ app.get('/api/dashboard/admin', async (req, res) => {
 app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
     const { affiliateId } = req.params;
     try {
-        const wallet = await pool.query('SELECT COALESCE(balance, 0) as balance FROM wallets WHERE affiliate_id=$1', [affiliateId]);
-        const pendingComm = await pool.query("SELECT COALESCE(SUM(commission_amount), 0) as total FROM commissions WHERE affiliate_id=$1 AND status='pending'", [affiliateId]);
-        const pendingCommCount = await pool.query("SELECT COUNT(*) FROM commissions WHERE affiliate_id=$1 AND status='pending'", [affiliateId]);
-        const totalClicks = await pool.query('SELECT COUNT(*) FROM referral_clicks WHERE affiliate_id=$1', [affiliateId]);
-        const totalSales = await pool.query("SELECT COUNT(*) FROM transactions WHERE affiliate_id=$1 AND status='completed'", [affiliateId]);
-        const campaigns = await pool.query('SELECT COUNT(*) FROM affiliate_campaigns WHERE affiliate_id=$1', [affiliateId]);
-
-        // Kalkulasi Reputation Score Real-time untuk 6 hari terakhir
         const sixDaysAgo = new Date();
         sixDaysAgo.setDate(sixDaysAgo.getDate() - 5);
         sixDaysAgo.setHours(0,0,0,0);
 
-        const recentClicks = await pool.query(
-            "SELECT TO_CHAR(clicked_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY date_str", 
-            [affiliateId, sixDaysAgo]
-        );
-        const recentSales = await pool.query(
-            "SELECT TO_CHAR(created_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY date_str", 
-            [affiliateId, sixDaysAgo]
-        );
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth() + 1; // 1-based
+        const yearStart = new Date(`${currentYear}-01-01`);
 
+        // Execute all 10 independent database queries concurrently to drastically reduce loading times
+        const [
+            wallet, pendingComm, pendingCommCount, totalClicks, totalSales, campaigns, 
+            recentClicks, recentSales, monthlySalesRaw, monthlyClicksRaw
+        ] = await Promise.all([
+            pool.query('SELECT COALESCE(balance, 0) as balance FROM wallets WHERE affiliate_id=$1', [affiliateId]),
+            pool.query("SELECT COALESCE(SUM(commission_amount), 0) as total FROM commissions WHERE affiliate_id=$1 AND status='pending'", [affiliateId]),
+            pool.query("SELECT COUNT(*) FROM commissions WHERE affiliate_id=$1 AND status='pending'", [affiliateId]),
+            pool.query('SELECT COUNT(*) FROM referral_clicks WHERE affiliate_id=$1', [affiliateId]),
+            pool.query("SELECT COUNT(*) FROM transactions WHERE affiliate_id=$1 AND status='completed'", [affiliateId]),
+            pool.query('SELECT COUNT(*) FROM affiliate_campaigns WHERE affiliate_id=$1', [affiliateId]),
+            pool.query("SELECT TO_CHAR(clicked_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY date_str", [affiliateId, sixDaysAgo]),
+            pool.query("SELECT TO_CHAR(created_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY date_str", [affiliateId, sixDaysAgo]),
+            pool.query("SELECT EXTRACT(MONTH FROM created_at)::int as month, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY month ORDER BY month", [affiliateId, yearStart]),
+            pool.query("SELECT EXTRACT(MONTH FROM clicked_at)::int as month, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY month ORDER BY month", [affiliateId, yearStart])
+        ]);
+
+        // Kalkulasi Reputation Score Real-time
         const daysArray = [];
         const valuesArray = [];
-        const today = new Date();
         for (let i = 5; i >= 0; i--) {
             const d = new Date(today);
             d.setDate(d.getDate() - i);
@@ -762,7 +767,6 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
             const clicksOnDay = parseInt(recentClicks.rows.find(r => r.date_str === dateStr)?.count || 0);
             const salesOnDay = parseInt(recentSales.rows.find(r => r.date_str === dateStr)?.count || 0);
             
-            // Rumus Score: Base 50 + (2 poin per click) + (10 poin per sale), max 100
             let dailyScore = 50 + (clicksOnDay * 2) + (salesOnDay * 10);
             if (dailyScore > 100) dailyScore = 100;
             
@@ -774,26 +778,19 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
         let trend = currentReputation - valuesArray[0];
         trend = parseFloat(trend.toFixed(1));
 
-        // Monthly sales dari Jan sampai bulan sekarang
-        const currentYear = today.getFullYear();
-        const currentMonth = today.getMonth() + 1; // 1-based
-        const yearStart = new Date(`${currentYear}-01-01`);
-
-        const monthlySalesRaw = await pool.query(
-            `SELECT EXTRACT(MONTH FROM created_at)::int as month, COUNT(*) as count
-             FROM transactions
-             WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2
-             GROUP BY month ORDER BY month`,
-            [affiliateId, yearStart]
-        );
-
+        // Format Monthly Charts
         const MONTH_NAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
         const monthLabels = [];
-        const monthValues = [];
+        const monthValuesSales = [];
+        const monthValuesClicks = [];
         for (let m = 1; m <= currentMonth; m++) {
             monthLabels.push(MONTH_NAMES[m - 1]);
-            const found = monthlySalesRaw.rows.find(r => r.month === m);
-            monthValues.push(found ? parseInt(found.count) : 0);
+            
+            const foundSales = monthlySalesRaw.rows.find(r => r.month === m);
+            monthValuesSales.push(foundSales ? parseInt(foundSales.count) : 0);
+            
+            const foundClicks = monthlyClicksRaw.rows.find(r => r.month === m);
+            monthValuesClicks.push(foundClicks ? parseInt(foundClicks.count) : 0);
         }
 
         res.json({
@@ -805,35 +802,9 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
                 totalClicks: parseInt(totalClicks.rows[0].count),
                 totalSales: parseInt(totalSales.rows[0].count),
                 activeCampaigns: parseInt(campaigns.rows[0].count),
-                reputationData: {
-                    days: daysArray,
-                    values: valuesArray,
-                    current: currentReputation,
-                    trend: trend
-                },
-                salesChart: {
-                    labels: monthLabels,
-                    values: monthValues,
-                    year: currentYear
-                },
-                clicksChart: await (async () => {
-                    const monthlyClicksRaw = await pool.query(
-                        `SELECT EXTRACT(MONTH FROM clicked_at)::int as month, COUNT(*) as count
-                         FROM referral_clicks
-                         WHERE affiliate_id=$1 AND clicked_at >= $2
-                         GROUP BY month ORDER BY month`,
-                        [affiliateId, yearStart]
-                    );
-                    const clickLabels = [];
-                    const clickValues = [];
-                    const MNAMES = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-                    for (let m = 1; m <= currentMonth; m++) {
-                        clickLabels.push(MNAMES[m - 1]);
-                        const found = monthlyClicksRaw.rows.find(r => r.month === m);
-                        clickValues.push(found ? parseInt(found.count) : 0);
-                    }
-                    return { labels: clickLabels, values: clickValues, year: currentYear };
-                })()
+                reputationData: { days: daysArray, values: valuesArray, current: currentReputation, trend },
+                salesChart: { labels: monthLabels, values: monthValuesSales, year: currentYear },
+                clicksChart: { labels: monthLabels, values: monthValuesClicks, year: currentYear }
             }
         });
     } catch (err) {
