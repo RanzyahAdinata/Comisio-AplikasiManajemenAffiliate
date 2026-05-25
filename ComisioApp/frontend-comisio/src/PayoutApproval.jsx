@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { User, Check, X, Banknote, Calendar, CreditCard, Filter, Eye } from "lucide-react";
 import NotificationIcon from "./NotificationIcon";
 import Sidebar from "./Sidebar";
+import CustomSelect from "./CustomSelect";
 import Swal from "sweetalert2";
 import "./ManageProduct.css";
 
@@ -13,6 +14,8 @@ export default function PayoutApproval({ navigate }) {
   const [search, setSearch] = useState("");
   const [payouts, setPayouts] = useState([]);
   const [filter, setFilter] = useState("all");
+  const [monthFilter, setMonthFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("all");
 
   let user;
   try {
@@ -80,7 +83,20 @@ export default function PayoutApproval({ navigate }) {
   const filteredPayouts = payouts.filter(p => {
     const matchSearch = (p.first_name + ' ' + p.last_name).toLowerCase().includes(search.toLowerCase());
     const matchFilter = filter === "all" || p.status === filter;
-    return matchSearch && matchFilter;
+    
+    let matchMonth = true;
+    let matchYear = true;
+    if (p.created_at) {
+      const d = new Date(p.created_at);
+      if (monthFilter !== "all") {
+        matchMonth = (d.getMonth() + 1).toString() === monthFilter;
+      }
+      if (yearFilter !== "all") {
+        matchYear = d.getFullYear().toString() === yearFilter;
+      }
+    }
+    
+    return matchSearch && matchFilter && matchMonth && matchYear;
   });
 
   const pendingCount = payouts.filter(p => p.status === 'pending').length;
@@ -121,10 +137,37 @@ export default function PayoutApproval({ navigate }) {
           </div>
         </div>
 
-        <div className="manage-actions">
-          <button className={`btn-add-product ${filter === 'all' ? '' : 'btn-seed-product'}`} onClick={() => setFilter("all")} style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-            <Filter size={16} strokeWidth={1.5} /> Show All
-          </button>
+        <div className="manage-actions" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "10px" }}>
+          <div style={{ display: "flex", gap: "10px", alignItems: "center", flexWrap: "wrap" }}>
+            <button className={`btn-add-product ${filter === 'all' ? '' : 'btn-seed-product'}`} onClick={() => setFilter("all")} style={{ display: "flex", alignItems: "center", gap: "6px", height: "38px" }}>
+              <Filter size={16} strokeWidth={1.5} /> Show All
+            </button>
+            
+            <CustomSelect
+              options={[
+                { label: "All Months", value: "all" },
+                ...Array.from({length: 12}, (_, i) => ({ label: new Date(0, i).toLocaleString('id-ID', { month: 'long' }), value: String(i + 1) }))
+              ]}
+              value={monthFilter}
+              onChange={(e) => setMonthFilter(e.target.value)}
+              placeholder="Month"
+              style={{ width: "140px" }}
+            />
+            
+            <CustomSelect
+              options={[
+                { label: "All Years", value: "all" },
+                { label: "2024", value: "2024" },
+                { label: "2025", value: "2025" },
+                { label: "2026", value: "2026" },
+                { label: "2027", value: "2027" }
+              ]}
+              value={yearFilter}
+              onChange={(e) => setYearFilter(e.target.value)}
+              placeholder="Year"
+              style={{ width: "120px" }}
+            />
+          </div>
           <span className="product-count">{filteredPayouts.length} requests</span>
         </div>
 
