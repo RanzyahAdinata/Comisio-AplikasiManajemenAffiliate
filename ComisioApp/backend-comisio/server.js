@@ -738,25 +738,28 @@ app.get('/api/dashboard/affiliate/:affiliateId', async (req, res) => {
         const currentMonth = today.getMonth() + 1; // 1-based
         const yearStart = new Date(`${currentYear}-01-01`);
 
-        // Execute all 10 independent database queries concurrently to drastically reduce loading times
+        // Execute all independent database queries concurrently to drastically reduce loading times
         const [
             wallet, pendingComm, pendingCommCount, totalClicks, totalSales, campaigns, 
-            recentClicks, recentSales, monthlySalesRaw, monthlyClicksRaw
+            recentClicks, recentSales, monthlySalesRaw, monthlyClicksRaw,
+            allTimeClicks, allTimeSales
         ] = await Promise.all([
             pool.query('SELECT COALESCE(balance, 0) as balance FROM wallets WHERE affiliate_id=$1', [affiliateId]),
             pool.query("SELECT COALESCE(SUM(commission_amount), 0) as total FROM commissions WHERE affiliate_id=$1 AND status='pending'", [affiliateId]),
             pool.query("SELECT COUNT(*) FROM commissions WHERE affiliate_id=$1 AND status='pending'", [affiliateId]),
-            pool.query('SELECT COUNT(*) FROM referral_clicks WHERE affiliate_id=$1', [affiliateId]),
-            pool.query("SELECT COUNT(*) FROM transactions WHERE affiliate_id=$1 AND status='completed'", [affiliateId]),
+            pool.query("SELECT COUNT(*) FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= DATE_TRUNC('month', NOW())", [affiliateId]),
+            pool.query("SELECT COUNT(*) FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= DATE_TRUNC('month', NOW())", [affiliateId]),
             pool.query('SELECT COUNT(*) FROM affiliate_campaigns WHERE affiliate_id=$1', [affiliateId]),
             pool.query("SELECT TO_CHAR(clicked_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY date_str", [affiliateId, sevenDaysAgo]),
             pool.query("SELECT TO_CHAR(created_at, 'YYYY-MM-DD') as date_str, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY date_str", [affiliateId, sevenDaysAgo]),
             pool.query("SELECT EXTRACT(MONTH FROM created_at)::int as month, COUNT(*) as count FROM transactions WHERE affiliate_id=$1 AND status='completed' AND created_at >= $2 GROUP BY month ORDER BY month", [affiliateId, yearStart]),
-            pool.query("SELECT EXTRACT(MONTH FROM clicked_at)::int as month, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY month ORDER BY month", [affiliateId, yearStart])
+            pool.query("SELECT EXTRACT(MONTH FROM clicked_at)::int as month, COUNT(*) as count FROM referral_clicks WHERE affiliate_id=$1 AND clicked_at >= $2 GROUP BY month ORDER BY month", [affiliateId, yearStart]),
+            pool.query('SELECT COUNT(*) FROM referral_clicks WHERE affiliate_id=$1', [affiliateId]),
+            pool.query("SELECT COUNT(*) FROM transactions WHERE affiliate_id=$1 AND status='completed'", [affiliateId])
         ]);
 
-        // Kalkulasi Reputation Score Real-time (Akumulatif)
-        let rawTodayScore = 50 + (parseInt(totalClicks.rows[0].count) * 0.5) + (parseInt(totalSales.rows[0].count) * 2);
+        // Kalkulasi Reputation Score Real-time (Akumulatif) - menggunakan data all-time
+        let rawTodayScore = 50 + (parseInt(allTimeClicks.rows[0].count) * 0.5) + (parseInt(allTimeSales.rows[0].count) * 2);
         // Membulatkan agar tidak ada angka desimal
         rawTodayScore = Math.floor(rawTodayScore);
         
